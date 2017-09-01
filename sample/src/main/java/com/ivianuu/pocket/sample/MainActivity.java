@@ -1,16 +1,14 @@
 package com.ivianuu.pocket.sample;
 
 import android.os.Handler;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Pair;
 
-import com.google.gson.Gson;
 import com.ivianuu.pocket.Pocket;
 
 import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 

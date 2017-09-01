@@ -18,10 +18,11 @@ package com.ivianuu.pocket;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Pair;
+import android.support.v4.util.Pair;
 
 import com.google.gson.Gson;
 
+import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -88,7 +89,7 @@ public interface Pocket<T> {
      * Returns all values
      */
     @NonNull
-    Single<List<Pair<String, T>>> getAllValues();
+    Single<HashMap<String, T>> getAllValues();
 
     /**
      * Emits on key changes

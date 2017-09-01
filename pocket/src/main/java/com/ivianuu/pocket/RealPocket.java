@@ -18,10 +18,11 @@ package com.ivianuu.pocket;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.util.Pair;
+import android.support.v4.util.Pair;
 
 import com.google.gson.Gson;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -48,7 +49,6 @@ class RealPocket<T> implements Pocket<T> {
 
     private final Scheduler scheduler;
     private final Storage<T> storage;
-    private final Class<T> clazz;
 
     private final PublishProcessor<String> keyChangesProcessor = PublishProcessor.create();
 
@@ -58,8 +58,7 @@ class RealPocket<T> implements Pocket<T> {
                @NonNull Gson gson,
                @NonNull Class<T> clazz) {
         this.scheduler = scheduler;
-        this.clazz = clazz;
-        this.storage = new RealStorage<T>(context, name, gson, clazz);
+        this.storage = new RealStorage<>(context, name, gson, clazz);
     }
 
     @NonNull
@@ -187,40 +186,27 @@ class RealPocket<T> implements Pocket<T> {
 
     @NonNull
     @Override
-    public Single<List<Pair<String, T>>> getAllValues() {
-        return getAllKeys()
-                .toObservable()
-                .flatMapIterable(new Function<List<String>, Iterable<String>>() {
-                    @Override
-                    public Iterable<String> apply(List<String> keys) throws Exception {
-                        return keys;
+    public Single<HashMap<String, T>> getAllValues() {
+        return Single.create(new SingleOnSubscribe<HashMap<String, T>>() {
+            @Override
+            public void subscribe(SingleEmitter<HashMap<String, T>> e) throws Exception {
+                List<String> keys = getAllKeys().blockingGet();
+                HashMap<String, T> map = new HashMap<>();
+                for (String key : keys) {
+                    if (!e.isDisposed()) {
+                        // stop if the observer is not interested anymore
+                        return;
                     }
-                })
-                .flatMapMaybe(new Function<String, MaybeSource<Pair<String, Object>>>() {
-                    @Override
-                    public MaybeSource<Pair<String, Object>> apply(final String key) throws Exception {
-                        return read(key)
-                                .map(new Function<Object, Pair<String, Object>>() {
-                                    @Override
-                                    public Pair<String, Object> apply(Object value) throws Exception {
-                                        return new Pair<>(key, value);
-                                    }
-                                });
-                    }
-                })
-                .filter(new Predicate<Pair<String, Object>>() {
-                    @Override
-                    public boolean test(Pair<String, Object> pair) throws Exception {
-                        return clazz.isInstance(pair.second);
-                    }
-                })
-                .map(new Function<Pair<String, Object>, Pair<String, T>>() {
-                    @Override
-                    public Pair<String, T> apply(Pair<String, Object> pair) throws Exception {
-                        return new Pair<>(pair.first, clazz.cast(pair.second));
-                    }
-                })
-                .toList();
+
+                    T value = read(key).blockingGet();
+                    map.put(key, value);
+                }
+
+                if (!e.isDisposed()) {
+                    e.onSuccess(map);
+                }
+            }
+        });
     }
 
     @NonNull

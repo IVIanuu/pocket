@@ -193,7 +193,7 @@ class RealPocket<T> implements Pocket<T> {
                 List<String> keys = getAllKeys().blockingGet();
                 HashMap<String, T> map = new HashMap<>();
                 for (String key : keys) {
-                    if (!e.isDisposed()) {
+                    if (e.isDisposed()) {
                         // stop if the observer is not interested anymore
                         return;
                     }

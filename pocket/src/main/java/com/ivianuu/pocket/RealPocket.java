@@ -17,6 +17,7 @@
 package com.ivianuu.pocket;
 
 import android.content.Context;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
@@ -61,7 +62,7 @@ class RealPocket<T> implements Pocket<T> {
         this.storage = new RealStorage<>(context, name, gson, clazz);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Completable destroy() {
         return getAllKeys()
@@ -78,7 +79,7 @@ class RealPocket<T> implements Pocket<T> {
                 .subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Completable write(@NonNull final String key, @NonNull final T value) {
         return Completable
@@ -98,7 +99,7 @@ class RealPocket<T> implements Pocket<T> {
                 .subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Maybe<T> read(@NonNull final String key) {
         return Maybe.create(new MaybeOnSubscribe<T>() {
@@ -118,6 +119,7 @@ class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
+    @CheckResult @NonNull
     @Override
     public Single<T> read(@NonNull final String key, @NonNull final T defaultValue) {
         return Single.create(new SingleOnSubscribe<T>() {
@@ -131,7 +133,7 @@ class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<Boolean> exists(@NonNull final String key) {
         return Single.fromCallable(new Callable<Boolean>() {
@@ -142,7 +144,7 @@ class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<Long> lastModified(@NonNull final String key) {
         return Single.fromCallable(new Callable<Long>() {
@@ -153,7 +155,7 @@ class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Completable delete(@NonNull final String key) {
         return Completable
@@ -173,7 +175,7 @@ class RealPocket<T> implements Pocket<T> {
                 .subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<List<String>> getAllKeys() {
         return Single.fromCallable(new Callable<List<String>>() {
@@ -184,7 +186,7 @@ class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<HashMap<String, T>> getAllValues() {
         return Single.create(new SingleOnSubscribe<HashMap<String, T>>() {
@@ -209,13 +211,13 @@ class RealPocket<T> implements Pocket<T> {
         });
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Flowable<String> keyChanges() {
         return keyChangesProcessor.share();
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Flowable<T> latest(@NonNull final String key) {
         return keyChanges()
@@ -234,7 +236,7 @@ class RealPocket<T> implements Pocket<T> {
                 });
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Flowable<Pair<String, T>> updates() {
         return keyChanges()

@@ -17,6 +17,7 @@
 package com.ivianuu.pocket;
 
 import android.content.Context;
+import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
@@ -40,75 +41,76 @@ public interface Pocket<T> {
     /**
      * Destroys the pocket
      */
-    @NonNull
+    @CheckResult @NonNull
     Completable destroy();
 
     /**
      * Persists the value
      */
-    @NonNull
+    @CheckResult @NonNull
     Completable write(@NonNull String key, @NonNull T value);
 
     /**
      * Reads the value for the key
      */
-    @NonNull
+    @CheckResult @NonNull
     Maybe<T> read(@NonNull String key);
 
     /**
      * Reads the value for the key
      * if no value found it will return the default value
      */
+    @CheckResult @NonNull
     Single<T> read(@NonNull String key, @NonNull T defaultValue);
 
     /**
      * Returns whether the key exists
      */
-    @NonNull
+    @CheckResult @NonNull
     Single<Boolean> exists(@NonNull String key);
 
     /**
      * Returns the last modification time
      */
-    @NonNull
+    @CheckResult @NonNull
     Single<Long> lastModified(@NonNull String key);
 
     /**
      * Deletes the value for the key
      */
-    @NonNull
+    @CheckResult @NonNull
     Completable delete(@NonNull String key);
 
     /**
      * Returns all keys
      */
-    @NonNull
+    @CheckResult @NonNull
     Single<List<String>> getAllKeys();
 
     /**
      * Returns all values
      */
-    @NonNull
+    @CheckResult @NonNull
     Single<HashMap<String, T>> getAllValues();
 
     /**
      * Emits on key changes
      */
-    @NonNull
+    @CheckResult @NonNull
     Flowable<String> keyChanges();
 
     /**
      * Emits on value changes
      * Emits on subscribe
      */
-    @NonNull
+    @CheckResult @NonNull
     Flowable<T> latest(@NonNull final String key);
 
     /**
      * Emits on key changes
      * You have to cast the objects
      */
-    @NonNull
+    @CheckResult @NonNull
     Flowable<Pair<String, T>> updates();
 
     final class Builder<T> {

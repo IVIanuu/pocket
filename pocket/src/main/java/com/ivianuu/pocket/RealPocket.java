@@ -46,7 +46,7 @@ import io.reactivex.processors.PublishProcessor;
 /**
  * RealPocket dao
  */
-class RealPocket<T> implements Pocket<T> {
+final class RealPocket<T> implements Pocket<T> {
 
     private final Scheduler scheduler;
     private final Storage<T> storage;

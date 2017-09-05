@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Store implementation
  */
-class RealStorage<T> implements Storage<T> {
+final class RealStorage<T> implements Storage<T> {
 
     private final Context context;
     private final String dbName;

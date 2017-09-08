@@ -2,6 +2,7 @@
   <dictionary name="IVIanuu">
     <words>
       <w>gsonserializer</w>
+      <w>jacksonserializer</w>
       <w>moshi</w>
       <w>moshiserializer</w>
       <w>sharedpreferencesstorage</w>

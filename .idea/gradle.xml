@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/pocket-kotlin" />
             <option value="$PROJECT_DIR$/sample" />
             <option value="$PROJECT_DIR$/serializer-gson" />
+            <option value="$PROJECT_DIR$/serializer-jackson" />
             <option value="$PROJECT_DIR$/serializer-moshi" />
             <option value="$PROJECT_DIR$/storage-filesystem" />
             <option value="$PROJECT_DIR$/storage-sharedpreferences" />

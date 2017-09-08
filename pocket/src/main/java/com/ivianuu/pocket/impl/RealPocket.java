@@ -70,7 +70,7 @@ final class RealPocket implements Pocket {
 
     @NonNull
     @Override
-    public <T> Completable put(@NonNull final String key, @NonNull final T value, @NonNull Class<T> clazz) {
+    public <T> Completable put(@NonNull final String key, @NonNull final T value) {
         Completable completable = Completable
                 .fromCallable(new Callable<Object>() {
                     @Override

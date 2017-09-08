@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Person person = new Person(name);
-                Disposable addDisposable = pocket.put(name, person, Person.class)
+                Disposable addDisposable = pocket.put(name, person)
                         .observeOn(mainThread())
                         .subscribe(new Action() {
                             @Override

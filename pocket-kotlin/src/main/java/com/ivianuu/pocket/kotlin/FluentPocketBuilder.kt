@@ -16,10 +16,7 @@
 
 package com.ivianuu.pocket.kotlin
 
-import com.ivianuu.pocket.Cache
-import com.ivianuu.pocket.Encryption
-import com.ivianuu.pocket.Serializer
-import com.ivianuu.pocket.Storage
+import com.ivianuu.pocket.*
 import io.reactivex.Scheduler
 
 /**
@@ -29,12 +26,16 @@ class FluentPocketBuilder private constructor() {
 
     companion object {
 
+        /**
+         * Returns a new pocket
+         */
         fun builder(cache: Cache? = null,
                     encryption: Encryption? = null,
                     scheduler : Scheduler? = null,
                     serializer: Serializer,
-                    storage: Storage) : FluentRealPocketBuilder {
+                    storage: Storage) : Pocket {
             return FluentRealPocketBuilder(cache, encryption, scheduler, serializer, storage)
+                    .build()
         }
     }
 }

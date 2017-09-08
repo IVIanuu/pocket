@@ -35,7 +35,7 @@ public interface Pocket {
      * Persists the value
      */
     @CheckResult @NonNull
-    <T> Completable put(@NonNull String key, @NonNull T value, @NonNull Class<T> clazz);
+    <T> Completable put(@NonNull String key, @NonNull T value);
 
     /**
      * Reads the value for the key

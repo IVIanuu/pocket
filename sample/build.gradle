@@ -22,6 +22,9 @@ dependencies {
     // Cache
     implementation project(':cache-lru')
 
+    // Encryption
+    implementation project(':encryption-base64')
+
     // Gson Serializer
     implementation project(':serializer-gson')
 

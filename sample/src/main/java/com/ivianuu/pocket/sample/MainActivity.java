@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.ivianuu.pocket.Pocket;
-import com.ivianuu.pocket.filesystemstorage.FileSystemStorage;
+import com.ivianuu.pocket.base64encryption.Base64Encryption;
 import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 import com.ivianuu.pocket.lrucache.PocketLruCache;
@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         pocket = PocketBuilder.builder()
                 .cache(PocketLruCache.create(5))
+                .encryption(Base64Encryption.create())
                 .serializer(GsonSerializer.create())
                 .storage(SharedPreferencesStorage.create(this))
                 .build();

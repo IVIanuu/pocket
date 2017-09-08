@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/cache-lru" />
+            <option value="$PROJECT_DIR$/encryption-base64" />
             <option value="$PROJECT_DIR$/pocket" />
             <option value="$PROJECT_DIR$/sample" />
             <option value="$PROJECT_DIR$/serializer-gson" />

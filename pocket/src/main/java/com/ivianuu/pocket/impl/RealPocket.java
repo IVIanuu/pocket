@@ -18,6 +18,7 @@ package com.ivianuu.pocket.impl;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.ivianuu.pocket.Cache;
 import com.ivianuu.pocket.Encryption;
@@ -59,7 +60,7 @@ final class RealPocket implements Pocket {
                @NonNull Encryption encryption,
                @NonNull Storage storage,
                @NonNull Serializer serializer,
-               @NonNull Scheduler scheduler) {
+               @Nullable Scheduler scheduler) {
         this.cache = cache;
         this.encryption = encryption;
         this.storage = storage;
@@ -70,7 +71,7 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Completable put(@NonNull final String key, @NonNull final T value, @NonNull Class<T> clazz) {
-        return Completable
+        Completable completable = Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
                     public Object call() throws Exception {
@@ -93,19 +94,26 @@ final class RealPocket implements Pocket {
                         // notify update
                         keyChangesProcessor.onNext(key);
                     }
-                }).subscribeOn(scheduler);
+                });
+        if (scheduler != null) {
+            completable = completable.subscribeOn(scheduler);
+        }
+
+        return completable;
     }
 
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
+        Maybe<T> maybe;
+
         // first try to get the cached value
         final T cachedValue = cache.get(key);
         if (cachedValue != null) {
-            return Maybe.just(cachedValue);
+            maybe = Maybe.just(cachedValue);
         } else {
             // if the cache does not contains the key try to fetch from disk
-            return Maybe.create(new MaybeOnSubscribe<T>() {
+            maybe = Maybe.create(new MaybeOnSubscribe<T>() {
                 @Override
                 public void subscribe(MaybeEmitter<T> e) throws Exception {
                     // get encrypted data
@@ -136,22 +144,32 @@ final class RealPocket implements Pocket {
                             // put into the cache afterwards
                             cache.put(key, value);
                         }
-                    }).subscribeOn(scheduler);
+                    });
         }
+        if (scheduler != null) {
+            maybe = maybe.subscribeOn(scheduler);
+        }
+
+        return maybe;
     }
 
     @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
-        return get(key, clazz)
+        Single<T> single = get(key, clazz)
                 .defaultIfEmpty(defaultValue) // switch to default
                 .toSingle();
+        if (scheduler != null) {
+            single = single.subscribeOn(scheduler);
+        }
+
+        return single;
     }
 
     @CheckResult @NonNull
     @Override
     public Completable delete(@NonNull final String key) {
-        return Completable
+        Completable completable = Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
                     public Object call() throws Exception {
@@ -168,8 +186,11 @@ final class RealPocket implements Pocket {
                         // notify change
                         keyChangesProcessor.onNext(key);
                     }
-                })
-                .subscribeOn(scheduler);
+                });
+        if (scheduler != null) {
+            completable = completable.subscribeOn(scheduler);
+        }
+        return completable;
     }
 
     @NonNull
@@ -177,7 +198,7 @@ final class RealPocket implements Pocket {
     public Completable deleteAll() {
         // first get all keys
         // we need the keys to proper update the key changes latest
-        return getAllKeys()
+        Completable completable = getAllKeys()
                 .doOnSuccess(new Consumer<List<String>>() {
                     @Override
                     public void accept(List<String> keys) throws Exception {
@@ -191,36 +212,52 @@ final class RealPocket implements Pocket {
                         }
                     }
                 })
-                .toCompletable()
-                .subscribeOn(scheduler);
+                .toCompletable();
+        if (scheduler != null) {
+            completable = completable.subscribeOn(scheduler);
+        }
+        return completable;
     }
 
     @NonNull
     @Override
     public Single<Boolean> contains(@NonNull final String key) {
-        return Single.fromCallable(new Callable<Boolean>() {
+        Single<Boolean> single = Single.fromCallable(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
                 return storage.contains(key);
             }
-        }).subscribeOn(scheduler);
+        });
+        if (scheduler != null) {
+            single = single.subscribeOn(scheduler);
+        }
+
+        return single;
     }
 
     @CheckResult @NonNull
     @Override
     public Single<List<String>> getAllKeys() {
-        return Single.fromCallable(new Callable<List<String>>() {
+        Single<List<String>> single = Single.fromCallable(new Callable<List<String>>() {
             @Override
             public List<String> call() throws Exception {
                 return storage.getAllKeys();
             }
-        }).subscribeOn(scheduler);
+        });
+        if (scheduler != null) {
+            single = single.subscribeOn(scheduler);
+        }
+        return single;
     }
 
     @CheckResult @NonNull
     @Override
     public Flowable<String> keyChanges() {
-        return keyChangesProcessor.share();
+        Flowable<String> flowable = keyChangesProcessor.share();
+        if (scheduler != null) {
+            flowable = flowable.subscribeOn(scheduler);
+        }
+        return flowable;
     }
 
     @NonNull
@@ -228,7 +265,7 @@ final class RealPocket implements Pocket {
     public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
-        return keyChanges()
+        Flowable<T> flowable = keyChanges()
                 .filter(new Predicate<String>() {
                     @Override
                     public boolean test(String changedKey) throws Exception {
@@ -242,5 +279,10 @@ final class RealPocket implements Pocket {
                         return get(key, clazz);
                     }
                 });
+        if (scheduler != null) {
+            flowable = flowable.subscribeOn(scheduler);
+        }
+
+        return flowable;
     }
 }

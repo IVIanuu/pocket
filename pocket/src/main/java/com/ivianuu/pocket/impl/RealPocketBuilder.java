@@ -25,7 +25,6 @@ import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
 import io.reactivex.Scheduler;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Generic pocket builder
@@ -104,9 +103,6 @@ public final class RealPocketBuilder {
         }
         if (encryption == null) {
             encryption = NoOpEncryption.create();
-        }
-        if (scheduler == null) {
-            scheduler = Schedulers.io();
         }
 
         return new RealPocket(cache, encryption, storage, serializer, scheduler);

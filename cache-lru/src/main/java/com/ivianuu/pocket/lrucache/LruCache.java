@@ -26,13 +26,13 @@ import com.ivianuu.pocket.Cache;
  */
 public final class LruCache implements Cache {
 
-    private final android.support.v4.util.LruCache lruCache;
+    private final android.support.v4.util.LruCache<String, Object> lruCache;
     private final SizePredicate sizePredicate;
 
     private LruCache(int maxSize, final SizePredicate sizePredicate) {
         this.sizePredicate = sizePredicate;
 
-        this.lruCache = new android.support.v4.util.LruCache(maxSize) {
+        this.lruCache = new android.support.v4.util.LruCache<String, Object>(maxSize) {
             @Override
             protected int sizeOf(String key, Object value) {
                 if (sizePredicate != null) {

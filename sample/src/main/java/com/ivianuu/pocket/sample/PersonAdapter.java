@@ -18,6 +18,7 @@ package com.ivianuu.pocket.sample;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,12 +38,13 @@ final class PersonAdapter extends RecyclerView.Adapter<PersonAdapter.PersonViewH
 
     PersonAdapter(@NonNull ClickDelegate clickDelegate) {
         this.clickDelegate = clickDelegate;
-        this.persons.addAll(persons);
     }
 
     void swapPersons(@NonNull List<Person> persons) {
+        Log.d("testtt", "swap data set " + persons.size());
         this.persons.clear();
         this.persons.addAll(persons);
+        notifyDataSetChanged();
     }
 
     @Override

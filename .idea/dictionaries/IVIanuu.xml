@@ -2,6 +2,7 @@
   <dictionary name="IVIanuu">
     <words>
       <w>gsonserializer</w>
+      <w>sharedpreferencesstorage</w>
     </words>
   </dictionary>
 </component>

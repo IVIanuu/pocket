@@ -13,30 +13,36 @@ import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.filesystemstorage.FileSystemStorage;
 import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
+import com.ivianuu.pocket.lrucache.PocketLruCache;
+import com.ivianuu.pocket.sharedpreferencesstorage.SharedPreferencesStorage;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.SingleSource;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
+import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
+
 public class MainActivity extends AppCompatActivity {
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    private Pocket pocket;
+    private PersonAdapter personAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Pocket pocket = PocketBuilder.builder()
+        pocket = PocketBuilder.builder()
+                .cache(PocketLruCache.create(5))
                 .serializer(GsonSerializer.create())
-                .storage(FileSystemStorage.create(this))
+                .storage(SharedPreferencesStorage.create(this))
                 .build();
 
         final EditText personInput = findViewById(R.id.person_input);
@@ -54,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Person person = new Person(name);
-                Disposable addDisposable = pocket.put(name, person)
+                Disposable addDisposable = pocket.put(name, person, Person.class)
+                        .observeOn(mainThread())
                         .subscribe(new Action() {
                             @Override
                             public void run() throws Exception {
@@ -78,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView personList = findViewById(R.id.person_list);
         personList.setLayoutManager(new LinearLayoutManager(this));
 
-        final PersonAdapter personAdapter = new PersonAdapter(new PersonAdapter.ClickDelegate() {
+        personAdapter = new PersonAdapter(new PersonAdapter.ClickDelegate() {
             @Override
             public void onDeleteClick(Person person) {
                 Disposable deleteDisposable = pocket.delete(person.getName())
@@ -89,31 +96,53 @@ public class MainActivity extends AppCompatActivity {
         personList.setAdapter(personAdapter);
 
         Disposable changesDisposable = pocket.keyChanges()
-                .flatMapSingle(new Function<String, SingleSource<HashMap<String, Object>>>() {
+                .subscribe(new Consumer<String>() {
                     @Override
-                    public SingleSource<HashMap<String, Object>> apply(String s) throws Exception {
-                        return pocket.getAllValues();
-                    }
-                })
-                .subscribe(new Consumer<HashMap<String, Object>>() {
-                    @Override
-                    public void accept(HashMap<String, Object> map) throws Exception {
-                        List<Person> persons = new ArrayList<>();
-                        for (Object value : map.values()) {
-                            if (value instanceof Person) {
-                                persons.add((Person) value);
-                            }
-                        }
-
-                        personAdapter.swapPersons(persons);
+                    public void accept(String s) throws Exception {
+                        loadData();
                     }
                 });
         compositeDisposable.add(changesDisposable);
+
+        loadData();
+    }
+
+    private Disposable loadData;
+    private void loadData() {
+        if (loadData != null) {
+            loadData.dispose();
+        }
+
+        loadData = pocket.getAllKeys()
+                .toObservable()
+                .flatMapIterable(new Function<List<String>, Iterable<String>>() {
+                    @Override
+                    public Iterable<String> apply(List<String> strings) throws Exception {
+                        return strings;
+                    }
+                })
+                .concatMap(new Function<String, ObservableSource<Person>>() {
+                    @Override
+                    public ObservableSource<Person> apply(String s) throws Exception {
+                        return pocket.get(s, Person.class).toObservable();
+                    }
+                })
+                .toList()
+                .observeOn(mainThread())
+                .subscribe(new Consumer<List<Person>>() {
+                    @Override
+                    public void accept(List<Person> people) throws Exception {
+                        personAdapter.swapPersons(people);
+                    }
+                });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+        if (loadData != null) {
+            loadData.dispose();
+        }
     }
 }

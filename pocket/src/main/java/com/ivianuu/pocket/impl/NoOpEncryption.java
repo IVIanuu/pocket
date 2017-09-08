@@ -17,29 +17,34 @@
 package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
-import android.util.Pair;
+
+import com.ivianuu.pocket.Encryption;
 
 /**
- * Class meta helper
+ * No op encryption
  */
-final class ClassMetaUtil {
+final class NoOpEncryption implements Encryption {
 
-    private static final String DELIMITER = "=:=";
+    private NoOpEncryption() {}
 
-    private ClassMetaUtil() {
-        // no instances
+    /**
+     * Returns a new no op encryption
+     */
+    @NonNull
+    static Encryption create() {
+        return new NoOpEncryption();
     }
 
     @NonNull
-    static String pack(@NonNull String serialized, @NonNull Class<?> clazz) {
-        return serialized + DELIMITER + clazz.getName();
+    @Override
+    public String encrypt(@NonNull String key, @NonNull String value) {
+        return value;
     }
 
     @NonNull
-    static Pair<String, Class<?>> unpack(@NonNull String meta) throws ClassNotFoundException {
-        String[] splitted = meta.split(DELIMITER);
-        String serialized = splitted[0];
-        Class<?> clazz = Class.forName(splitted[1]);
-        return new Pair<String, Class<?>>(serialized, clazz);
+    @Override
+    public String decrypt(@NonNull String key, @NonNull String encrypted) {
+        return encrypted;
     }
+
 }

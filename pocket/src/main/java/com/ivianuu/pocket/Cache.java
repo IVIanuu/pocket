@@ -14,37 +14,34 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket.impl;
+package com.ivianuu.pocket;
 
 import android.support.annotation.NonNull;
-
-import com.ivianuu.pocket.Encryption;
+import android.support.annotation.Nullable;
 
 /**
- * No op encryption
+ * Cache interface
  */
-final class NoEncryption implements Encryption {
-
-    private NoEncryption() {}
+public interface Cache {
 
     /**
-     * Returns a new no op encryption
+     * Puts the value into the cache
      */
-    @NonNull
-    static Encryption create() {
-        return new NoEncryption();
-    }
+    <T> void put(@NonNull String key, @NonNull T value);
 
-    @NonNull
-    @Override
-    public String encrypt(@NonNull String key, @NonNull String value) {
-        return value;
-    }
+    /**
+     * Returns the value from the cache or null if not exists
+     */
+    @Nullable
+    <T> T get(@NonNull String key);
 
-    @NonNull
-    @Override
-    public String decrypt(@NonNull String key, @NonNull String encrypted) {
-        return encrypted;
-    }
+    /**
+     * Removes the key from the cache
+     */
+    void remove(@NonNull String key);
 
+    /**
+     * Removes all values from the cache
+     */
+    void removeAll();
 }

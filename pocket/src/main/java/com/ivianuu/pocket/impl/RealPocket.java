@@ -18,14 +18,13 @@ package com.ivianuu.pocket.impl;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
+import com.ivianuu.pocket.Cache;
 import com.ivianuu.pocket.Encryption;
 import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -37,8 +36,6 @@ import io.reactivex.MaybeOnSubscribe;
 import io.reactivex.MaybeSource;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.SingleEmitter;
-import io.reactivex.SingleOnSubscribe;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
@@ -50,6 +47,7 @@ import io.reactivex.processors.PublishProcessor;
  */
 final class RealPocket implements Pocket {
 
+    private final Cache cache;
     private final Encryption encryption;
     private final Storage storage;
     private final Serializer serializer;
@@ -57,10 +55,12 @@ final class RealPocket implements Pocket {
 
     private final PublishProcessor<String> keyChangesProcessor = PublishProcessor.create();
 
-    RealPocket(@NonNull Encryption encryption,
+    RealPocket(@NonNull Cache cache,
+               @NonNull Encryption encryption,
                @NonNull Storage storage,
                @NonNull Serializer serializer,
                @NonNull Scheduler scheduler) {
+        this.cache = cache;
         this.encryption = encryption;
         this.storage = storage;
         this.serializer = serializer;
@@ -69,7 +69,7 @@ final class RealPocket implements Pocket {
 
     @NonNull
     @Override
-    public <T> Completable put(@NonNull final String key, @NonNull final T value) {
+    public <T> Completable put(@NonNull final String key, @NonNull final T value, @NonNull Class<T> clazz) {
         return Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
@@ -77,11 +77,8 @@ final class RealPocket implements Pocket {
                         // serialize
                         String serialized = serializer.serialize(value);
 
-                        // add meta to deserialize without the need to put the class arg
-                        String meta = ClassMetaUtil.pack(serialized, value.getClass());
-
                         // encrypt
-                        String encrypted = encryption.encrypt(key, meta);
+                        String encrypted = encryption.encrypt(key, serialized);
 
                         // persist
                         storage.put(key, encrypted);
@@ -91,6 +88,9 @@ final class RealPocket implements Pocket {
                 .doOnComplete(new Action() {
                     @Override
                     public void run() throws Exception {
+                        // put into the cache
+                        cache.put(key, value);
+                        // notify update
                         keyChangesProcessor.onNext(key);
                     }
                 }).subscribeOn(scheduler);
@@ -98,43 +98,53 @@ final class RealPocket implements Pocket {
 
     @NonNull
     @Override
-    public <T> Maybe<T> get(@NonNull final String key) {
-        return Maybe.create(new MaybeOnSubscribe<T>() {
-            @Override
-            public void subscribe(MaybeEmitter<T> e) throws Exception {
-                // get encrypted data
-                String encrypted = storage.get(key);
+    public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
+        // first try to get the cached value
+        final T cachedValue = cache.get(key);
+        if (cachedValue != null) {
+            return Maybe.just(cachedValue);
+        } else {
+            // if the cache does not contains the key try to fetch from disk
+            return Maybe.create(new MaybeOnSubscribe<T>() {
+                @Override
+                public void subscribe(MaybeEmitter<T> e) throws Exception {
+                    // get encrypted data
+                    String encrypted = storage.get(key);
 
-                // null check
-                if (encrypted != null) {
-                    // decrypt to meta
-                    String meta = encryption.decrypt(key, encrypted);
+                    // null check
+                    if (encrypted != null) {
+                        // decrypt to serialized
+                        String serialized = encryption.decrypt(key, encrypted);
 
-                    // retrieve meta values
-                    Pair<String, Class<?>> metaPair = ClassMetaUtil.unpack(meta);
+                        // deserialize to the value
+                        T value = serializer.deserialize(serialized, clazz);
 
-                    // deserialize to the value
-                    T value = serializer.deserialize(metaPair.first, metaPair.second);
+                        // notify
+                        if (!e.isDisposed()) {
+                            e.onSuccess(value);
+                        }
+                    }
 
-                    // notify
                     if (!e.isDisposed()) {
-                        e.onSuccess(value);
+                        e.onComplete();
                     }
                 }
-
-                if (!e.isDisposed()) {
-                    e.onComplete();
-                }
-            }
-        }).subscribeOn(scheduler);
+            })
+                    .doOnSuccess(new Consumer<T>() {
+                        @Override
+                        public void accept(T value) throws Exception {
+                            // put into the cache afterwards
+                            cache.put(key, value);
+                        }
+                    }).subscribeOn(scheduler);
+        }
     }
 
     @NonNull
     @Override
-    public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue) {
-        // TODO: 08.09.2017 fix
-        return (Single<T>) get(key)
-                .defaultIfEmpty(defaultValue)
+    public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
+        return get(key, clazz)
+                .defaultIfEmpty(defaultValue) // switch to default
                 .toSingle();
     }
 
@@ -145,6 +155,7 @@ final class RealPocket implements Pocket {
                 .fromCallable(new Callable<Object>() {
                     @Override
                     public Object call() throws Exception {
+                        // delete from storage
                         storage.delete(key);
                         return new Object();
                     }
@@ -152,6 +163,9 @@ final class RealPocket implements Pocket {
                 .doOnComplete(new Action() {
                     @Override
                     public void run() throws Exception {
+                        // remove from cache
+                        cache.remove(key);
+                        // notify change
                         keyChangesProcessor.onNext(key);
                     }
                 })
@@ -161,11 +175,17 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public Completable deleteAll() {
+        // first get all keys
+        // we need the keys to proper update the key changes latest
         return getAllKeys()
                 .doOnSuccess(new Consumer<List<String>>() {
                     @Override
                     public void accept(List<String> keys) throws Exception {
+                        // clear storage
                         storage.deleteAll();
+                        // clear cache
+                        cache.removeAll();
+                        // notify change
                         for (String key : keys) {
                             keyChangesProcessor.onNext(key);
                         }
@@ -199,38 +219,15 @@ final class RealPocket implements Pocket {
 
     @CheckResult @NonNull
     @Override
-    public Single<HashMap<String, Object>> getAllValues() {
-        return Single.create(new SingleOnSubscribe<HashMap<String, Object>>() {
-            @Override
-            public void subscribe(SingleEmitter<HashMap<String, Object>> e) throws Exception {
-                List<String> keys = getAllKeys().blockingGet();
-                HashMap<String, Object> map = new HashMap<>();
-                for (String key : keys) {
-                    if (e.isDisposed()) {
-                        // stop if the observer is not interested anymore
-                        return;
-                    }
-
-                    Object value = get(key).blockingGet();
-                    map.put(key, value);
-                }
-
-                if (!e.isDisposed()) {
-                    e.onSuccess(map);
-                }
-            }
-        });
-    }
-
-    @CheckResult @NonNull
-    @Override
     public Flowable<String> keyChanges() {
         return keyChangesProcessor.share();
     }
 
-    @CheckResult @NonNull
+    @NonNull
     @Override
-    public <T> Flowable<T> latest(@NonNull final String key) {
+    public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
+        // we need to filter the key changes were interested in
+        // every time the key changes we emit the next value
         return keyChanges()
                 .filter(new Predicate<String>() {
                     @Override
@@ -238,29 +235,11 @@ final class RealPocket implements Pocket {
                         return changedKey.equals(key);
                     }
                 })
-                .startWith("<init>") // Dummy value to trigger initial load.
+                .startWith("") // Dummy value to trigger initial load.
                 .flatMapMaybe(new Function<String, MaybeSource<? extends T>>() {
                     @Override
                     public MaybeSource<? extends T> apply(String s) throws Exception {
-                        return get(key);
-                    }
-                });
-    }
-
-    @CheckResult @NonNull
-    @Override
-    public Flowable<Pair<String, Object>> updates() {
-        return keyChanges()
-                .flatMapMaybe(new Function<String, MaybeSource<? extends Pair<String, Object>>>() {
-                    @Override
-                    public MaybeSource<? extends Pair<String, Object>> apply(final String key) throws Exception {
-                        return get(key)
-                                .map(new Function<Object, Pair<String, Object>>() {
-                                    @Override
-                                    public Pair<String, Object> apply(Object value) throws Exception {
-                                        return new Pair<>(key, value);
-                                    }
-                                });
+                        return get(key, clazz);
                     }
                 });
     }

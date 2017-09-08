@@ -18,6 +18,7 @@ package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
 
+import com.ivianuu.pocket.Cache;
 import com.ivianuu.pocket.Encryption;
 import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.Serializer;
@@ -33,10 +34,20 @@ public final class RealPocketBuilder {
 
     RealPocketBuilder() {}
 
+    private Cache cache;
     private Encryption encryption;
     private Storage storage;
     private Serializer serializer;
     private Scheduler scheduler;
+
+    /**
+     * Sets the cache
+     */
+    @NonNull
+    public RealPocketBuilder cache(@NonNull Cache cache) {
+        this.cache = cache;
+        return this;
+    }
 
     /**
      * Sets the encryption
@@ -79,13 +90,7 @@ public final class RealPocketBuilder {
      */
     @NonNull
     public Pocket build() {
-        if (encryption == null) {
-            encryption = NoEncryption.create();
-        }
-        if (scheduler == null) {
-            scheduler = Schedulers.io();
-        }
-
+        // check required modules
         if (storage == null) {
             throw new IllegalStateException("storage must be set");
         }
@@ -93,6 +98,17 @@ public final class RealPocketBuilder {
             throw new IllegalStateException("serializer must be set");
         }
 
-        return new RealPocket(encryption, storage, serializer, scheduler);
+        // check optionals
+        if (cache == null) {
+            cache = NoOpCache.create();
+        }
+        if (encryption == null) {
+            encryption = NoOpEncryption.create();
+        }
+        if (scheduler == null) {
+            scheduler = Schedulers.io();
+        }
+
+        return new RealPocket(cache, encryption, storage, serializer, scheduler);
     }
 }

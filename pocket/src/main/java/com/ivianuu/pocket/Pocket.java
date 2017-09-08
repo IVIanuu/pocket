@@ -18,9 +18,7 @@ package com.ivianuu.pocket;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import android.util.Pair;
 
-import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -37,20 +35,20 @@ public interface Pocket {
      * Persists the value
      */
     @CheckResult @NonNull
-    <T> Completable put(@NonNull String key, @NonNull T value);
+    <T> Completable put(@NonNull String key, @NonNull T value, @NonNull Class<T> clazz);
 
     /**
      * Reads the value for the key
      */
     @CheckResult @NonNull
-    <T> Maybe<T> get(@NonNull String key);
+    <T> Maybe<T> get(@NonNull String key, @NonNull Class<T> clazz);
 
     /**
      * Reads the value for the key
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
-    <T> Single<T> get(@NonNull String key, @NonNull T defaultValue);
+    <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz);
 
     /**
      * Deletes the value for the key
@@ -77,12 +75,6 @@ public interface Pocket {
     Single<List<String>> getAllKeys();
 
     /**
-     * Returns all values
-     */
-    @CheckResult @NonNull
-    Single<HashMap<String, Object>> getAllValues();
-
-    /**
      * Emits on key changes
      */
     @CheckResult @NonNull
@@ -93,12 +85,5 @@ public interface Pocket {
      * Emits on subscribe
      */
     @CheckResult @NonNull
-    <T> Flowable<T> latest(@NonNull final String key);
-
-    /**
-     * Emits on key changes
-     * You have to cast the objects
-     */
-    @CheckResult @NonNull
-    Flowable<Pair<String, Object>> updates();
+    <T> Flowable<T> stream(@NonNull final String key, @NonNull Class<T> clazz);
 }

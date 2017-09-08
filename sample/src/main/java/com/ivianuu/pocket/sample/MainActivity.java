@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 count++;
                 Pojooo pojooo = new Pojooo("hannes " + count, count, 3.14f * count);
-                stringPocket.write("my_key" + count, pojooo)
+                stringPocket.put("my_key" + count, pojooo)
                         .subscribe();
                 handler.postDelayed(this, 10);
             }

@@ -41,16 +41,7 @@ final class RealStorage<T> implements Storage<T> {
     }
 
     @Override
-    public synchronized void destroy() {
-        assertInit();
-
-        final String dbPath = getDbPath(context, dbName);
-        deleteDirectory(dbPath);
-        pocketDirCreated = false;
-    }
-
-    @Override
-    public synchronized void insert(@NonNull String key, @NonNull T value) {
+    public void put(@NonNull String key, @NonNull T value) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -75,7 +66,7 @@ final class RealStorage<T> implements Storage<T> {
 
     @Nullable
     @Override
-    public synchronized T select(@NonNull String key) {
+    public T get(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -87,7 +78,7 @@ final class RealStorage<T> implements Storage<T> {
             backupFile.renameTo(originalFile);
         }
 
-        if (!exist(key)) {
+        if (!contains(key)) {
             return null;
         }
 
@@ -95,7 +86,32 @@ final class RealStorage<T> implements Storage<T> {
     }
 
     @Override
-    public synchronized boolean exist(@NonNull String key) {
+    public void delete(@NonNull String key) {
+        assertInit();
+
+        final File originalFile = getOriginalFile(key);
+        if (!originalFile.exists()) {
+            return;
+        }
+
+        boolean deleted = originalFile.delete();
+        if (!deleted) {
+            throw new IllegalArgumentException("Couldn't delete file " + originalFile
+                    + " for table " + key);
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        assertInit();
+
+        final String dbPath = getDbPath(context, dbName);
+        deleteDirectory(dbPath);
+        pocketDirCreated = false;
+    }
+
+    @Override
+    public boolean contains(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -125,22 +141,6 @@ final class RealStorage<T> implements Storage<T> {
             return Arrays.asList(names);
         } else {
             return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public synchronized void deleteIfExists(@NonNull String key) {
-        assertInit();
-
-        final File originalFile = getOriginalFile(key);
-        if (!originalFile.exists()) {
-            return;
-        }
-
-        boolean deleted = originalFile.delete();
-        if (!deleted) {
-            throw new IllegalArgumentException("Couldn't delete file " + originalFile
-                    + " for table " + key);
         }
     }
 
@@ -222,7 +222,7 @@ final class RealStorage<T> implements Storage<T> {
         }
     }
 
-    private static boolean deleteDirectory(String dirPath) {
+    private static void deleteDirectory(String dirPath) {
         File directory = new File(dirPath);
         if (directory.exists()) {
             File[] files = directory.listFiles();
@@ -237,23 +237,22 @@ final class RealStorage<T> implements Storage<T> {
                 }
             }
         }
-        return directory.delete();
+        //noinspection ResultOfMethodCallIgnored
+        directory.delete();
     }
 
     private File makeBackupFile(File originalFile) {
         return new File(originalFile.getPath() + ".bak");
     }
     
-    private static boolean sync(FileOutputStream stream) {
+    private static void sync(FileOutputStream stream) {
         //noinspection EmptyCatchBlock
         try {
             if (stream != null) {
                 stream.getFD().sync();
             }
-            return true;
         } catch (IOException e) {
         }
-        return false;
     }
 }
 

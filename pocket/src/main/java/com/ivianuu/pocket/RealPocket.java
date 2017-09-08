@@ -62,31 +62,14 @@ final class RealPocket<T> implements Pocket<T> {
         this.storage = new RealStorage<>(context, name, gson, clazz);
     }
 
-    @CheckResult @NonNull
+    @NonNull
     @Override
-    public Completable destroy() {
-        return getAllKeys()
-                .doOnSuccess(new Consumer<List<String>>() {
-                    @Override
-                    public void accept(List<String> keys) throws Exception {
-                        storage.destroy();
-                        for (String key : keys) {
-                            keyChangesProcessor.onNext(key);
-                        }
-                    }
-                })
-                .toCompletable()
-                .subscribeOn(scheduler);
-    }
-
-    @CheckResult @NonNull
-    @Override
-    public Completable write(@NonNull final String key, @NonNull final T value) {
+    public Completable put(@NonNull final String key, @NonNull final T value) {
         return Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
                     public Object call() throws Exception {
-                        storage.insert(key, value);
+                        storage.put(key, value);
                         return new Object();
                     }
                 })
@@ -99,13 +82,13 @@ final class RealPocket<T> implements Pocket<T> {
                 .subscribeOn(scheduler);
     }
 
-    @CheckResult @NonNull
+    @NonNull
     @Override
-    public Maybe<T> read(@NonNull final String key) {
+    public Maybe<T> get(@NonNull final String key) {
         return Maybe.create(new MaybeOnSubscribe<T>() {
             @Override
             public void subscribe(MaybeEmitter<T> e) throws Exception {
-                T value = storage.select(key);
+                T value = storage.get(key);
                 if (value != null) {
                     if (!e.isDisposed()) {
                         e.onSuccess(value);
@@ -119,13 +102,13 @@ final class RealPocket<T> implements Pocket<T> {
         }).subscribeOn(scheduler);
     }
 
-    @CheckResult @NonNull
+    @NonNull
     @Override
-    public Single<T> read(@NonNull final String key, @NonNull final T defaultValue) {
+    public Single<T> get(@NonNull final String key, @NonNull final T defaultValue) {
         return Single.create(new SingleOnSubscribe<T>() {
             @Override
             public void subscribe(SingleEmitter<T> e) throws Exception {
-                T value = storage.select(key);
+                T value = storage.get(key);
                 if (!e.isDisposed()) {
                     e.onSuccess(value != null ? value : defaultValue);
                 }
@@ -135,11 +118,48 @@ final class RealPocket<T> implements Pocket<T> {
 
     @CheckResult @NonNull
     @Override
-    public Single<Boolean> exists(@NonNull final String key) {
+    public Completable delete(@NonNull final String key) {
+        return Completable
+                .fromCallable(new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                        storage.delete(key);
+                        return new Object();
+                    }
+                })
+                .doOnComplete(new Action() {
+                    @Override
+                    public void run() throws Exception {
+                        keyChangesProcessor.onNext(key);
+                    }
+                })
+                .subscribeOn(scheduler);
+    }
+
+    @NonNull
+    @Override
+    public Completable deleteAll() {
+        return getAllKeys()
+                .doOnSuccess(new Consumer<List<String>>() {
+                    @Override
+                    public void accept(List<String> keys) throws Exception {
+                        storage.deleteAll();
+                        for (String key : keys) {
+                            keyChangesProcessor.onNext(key);
+                        }
+                    }
+                })
+                .toCompletable()
+                .subscribeOn(scheduler);
+    }
+
+    @NonNull
+    @Override
+    public Single<Boolean> contains(@NonNull final String key) {
         return Single.fromCallable(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                return storage.exist(key);
+                return storage.contains(key);
             }
         }).subscribeOn(scheduler);
     }
@@ -153,26 +173,6 @@ final class RealPocket<T> implements Pocket<T> {
                 return storage.lastModified(key);
             }
         }).subscribeOn(scheduler);
-    }
-
-    @CheckResult @NonNull
-    @Override
-    public Completable delete(@NonNull final String key) {
-        return Completable
-                .fromCallable(new Callable<Object>() {
-                    @Override
-                    public Object call() throws Exception {
-                        storage.deleteIfExists(key);
-                        return new Object();
-                    }
-                })
-                .doOnComplete(new Action() {
-                    @Override
-                    public void run() throws Exception {
-                        keyChangesProcessor.onNext(key);
-                    }
-                })
-                .subscribeOn(scheduler);
     }
 
     @CheckResult @NonNull
@@ -200,7 +200,7 @@ final class RealPocket<T> implements Pocket<T> {
                         return;
                     }
 
-                    T value = read(key).blockingGet();
+                    T value = get(key).blockingGet();
                     map.put(key, value);
                 }
 
@@ -231,7 +231,7 @@ final class RealPocket<T> implements Pocket<T> {
                 .flatMapMaybe(new Function<String, MaybeSource<? extends T>>() {
                     @Override
                     public MaybeSource<? extends T> apply(String s) throws Exception {
-                        return read(key);
+                        return get(key);
                     }
                 });
     }
@@ -243,7 +243,7 @@ final class RealPocket<T> implements Pocket<T> {
                 .flatMapMaybe(new Function<String, MaybeSource<? extends Pair<String, T>>>() {
                     @Override
                     public MaybeSource<? extends Pair<String, T>> apply(final String key) throws Exception {
-                        return read(key)
+                        return get(key)
                                 .map(new Function<T, Pair<String,T>>() {
                                     @Override
                                     public Pair<String, T> apply(T value) throws Exception {

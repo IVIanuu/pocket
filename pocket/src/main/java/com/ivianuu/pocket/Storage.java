@@ -11,35 +11,35 @@ import java.util.List;
 interface Storage<T> {
 
     /**
-     * Deletes all values
-     */
-    void destroy();
-
-    /**
      * Inserts the value
      */
-    void insert(@NonNull String key, @NonNull T value);
+    void put(@NonNull String key, @NonNull T value);
 
     /**
      * Returns the value of the key or null
      */
     @Nullable
-    T select(@NonNull String key);
+    T get(@NonNull String key);
 
     /**
-     * Returns whether the key exists
+     * Deletes the key
      */
-    boolean exist(@NonNull String key);
+    void delete(@NonNull String key);
+
+    /**
+     * Deletes all values
+     */
+    void deleteAll();
+
+    /**
+     * Returns whether the storage contains the key
+     */
+    boolean contains(@NonNull String key);
 
     /**
      * Returns last modification time
      */
     long lastModified(@NonNull String key);
-
-    /**
-     * Deletes the key
-     */
-    void deleteIfExists(@NonNull String key);
 
     /**
      * Returns all keys in the path

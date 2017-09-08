@@ -39,47 +39,47 @@ import io.reactivex.schedulers.Schedulers;
 public interface Pocket<T> {
 
     /**
-     * Destroys the pocket
-     */
-    @CheckResult @NonNull
-    Completable destroy();
-
-    /**
      * Persists the value
      */
     @CheckResult @NonNull
-    Completable write(@NonNull String key, @NonNull T value);
+    Completable put(@NonNull String key, @NonNull T value);
 
     /**
      * Reads the value for the key
      */
     @CheckResult @NonNull
-    Maybe<T> read(@NonNull String key);
+    Maybe<T> get(@NonNull String key);
 
     /**
      * Reads the value for the key
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
-    Single<T> read(@NonNull String key, @NonNull T defaultValue);
-
-    /**
-     * Returns whether the key exists
-     */
-    @CheckResult @NonNull
-    Single<Boolean> exists(@NonNull String key);
-
-    /**
-     * Returns the last modification time
-     */
-    @CheckResult @NonNull
-    Single<Long> lastModified(@NonNull String key);
+    Single<T> get(@NonNull String key, @NonNull T defaultValue);
 
     /**
      * Deletes the value for the key
      */
     @CheckResult @NonNull
     Completable delete(@NonNull String key);
+
+    /**
+     * Deletes all values
+     */
+    @CheckResult @NonNull
+    Completable deleteAll();
+
+    /**
+     * Returns whether the key exists
+     */
+    @CheckResult @NonNull
+    Single<Boolean> contains(@NonNull String key);
+
+    /**
+     * Returns the last modification time
+     */
+    @CheckResult @NonNull
+    Single<Long> lastModified(@NonNull String key);
 
     /**
      * Returns all keys

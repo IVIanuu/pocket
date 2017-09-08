@@ -26,9 +26,7 @@ import com.ivianuu.pocket.Cache;
  */
 final class NoOpCache implements Cache {
 
-    private NoOpCache() {
-
-    }
+    private NoOpCache() {}
 
     /**
      * Returns a new no op cache

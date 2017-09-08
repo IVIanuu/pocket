@@ -26,26 +26,38 @@ import com.ivianuu.pocket.Encryption;
  */
 public final class Base64Encryption implements Encryption {
 
-    private Base64Encryption() {}
+    private final int flags;
+
+    private Base64Encryption(int flags) {
+        this.flags = flags;
+    }
 
     /**
      * Returns a new base 64 encryption
      */
     @NonNull
     public static Encryption create() {
-        return new Base64Encryption();
+        return create(0);
+    }
+
+    /**
+     * Returns a new base 64 encryption
+     */
+    @NonNull
+    public static Encryption create(int flags) {
+        return new Base64Encryption(flags);
     }
 
     @NonNull
     @Override
     public String encrypt(@NonNull String key, @NonNull String value) {
-        return new String(Base64.encode(value.getBytes(), 0));
+        return new String(Base64.encode(value.getBytes(), flags));
     }
 
     @NonNull
     @Override
     public String decrypt(@NonNull String key, @NonNull String encrypted) {
-        return new String(Base64.decode(encrypted, 0));
+        return new String(Base64.decode(encrypted, flags));
     }
 
 }

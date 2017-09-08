@@ -14,26 +14,37 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket;
+package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Type;
+import com.ivianuu.pocket.Encryption;
 
 /**
- * Serializes and deserializes objects
+ * No op encryption
  */
-public interface Serializer {
+final class NoEncryption implements Encryption {
+
+    private NoEncryption() {}
 
     /**
-     * Serializes the value
+     * Returns a new no op encryption
      */
     @NonNull
-    <T> String serialize(@NonNull T value);
+    static Encryption create() {
+        return new NoEncryption();
+    }
 
-    /**
-     * Deserializes the string to the value
-     */
     @NonNull
-    <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception;
+    @Override
+    public String encrypt(@NonNull String key, @NonNull String value) {
+        return value;
+    }
+
+    @NonNull
+    @Override
+    public String decrypt(@NonNull String key, @NonNull String encrypted) {
+        return encrypted;
+    }
+
 }

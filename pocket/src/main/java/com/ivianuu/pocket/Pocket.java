@@ -16,12 +16,9 @@
 
 package com.ivianuu.pocket;
 
-import android.content.Context;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
-
-import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,33 +26,31 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Maybe;
-import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * Pocket dao
  */
-public interface Pocket<T> {
+public interface Pocket {
 
     /**
      * Persists the value
      */
     @CheckResult @NonNull
-    Completable put(@NonNull String key, @NonNull T value);
+    <T> Completable put(@NonNull String key, @NonNull T value);
 
     /**
      * Reads the value for the key
      */
     @CheckResult @NonNull
-    Maybe<T> get(@NonNull String key);
+    <T> Maybe<T> get(@NonNull String key);
 
     /**
      * Reads the value for the key
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
-    Single<T> get(@NonNull String key, @NonNull T defaultValue);
+    <T> Single<T> get(@NonNull String key, @NonNull T defaultValue);
 
     /**
      * Deletes the value for the key
@@ -76,12 +71,6 @@ public interface Pocket<T> {
     Single<Boolean> contains(@NonNull String key);
 
     /**
-     * Returns the last modification time
-     */
-    @CheckResult @NonNull
-    Single<Long> lastModified(@NonNull String key);
-
-    /**
      * Returns all keys
      */
     @CheckResult @NonNull
@@ -91,7 +80,7 @@ public interface Pocket<T> {
      * Returns all values
      */
     @CheckResult @NonNull
-    Single<HashMap<String, T>> getAllValues();
+    Single<HashMap<String, Object>> getAllValues();
 
     /**
      * Emits on key changes
@@ -104,77 +93,12 @@ public interface Pocket<T> {
      * Emits on subscribe
      */
     @CheckResult @NonNull
-    Flowable<T> latest(@NonNull final String key);
+    <T> Flowable<T> latest(@NonNull final String key);
 
     /**
      * Emits on key changes
      * You have to cast the objects
      */
     @CheckResult @NonNull
-    Flowable<Pair<String, T>> updates();
-
-    final class Builder<T> {
-
-        private final String DEFAULT_NAME = "pocket";
-
-        private final Context context;
-        private final Class<T> clazz;
-
-        private String name;
-        private Gson gson;
-        private Scheduler scheduler;
-
-        /**
-         * Returns a new builder
-         */
-        public Builder(@NonNull Context context, @NonNull Class<T> clazz) {
-            this.context = context;
-            this.clazz = clazz;
-        }
-
-        /**
-         * The name of the pocket
-         */
-        @NonNull
-        public Builder<T> name(@NonNull String name) {
-            this.name = name;
-            return this;
-        }
-
-        /**
-         * Gson instance which will be used to serialize and deserialize values
-         */
-        @NonNull
-        public Builder<T> gson(@NonNull Gson gson) {
-            this.gson = gson;
-            return this;
-        }
-
-        /**
-         * The default scheduler
-         */
-        @NonNull
-        public Builder<T> scheduler(@NonNull Scheduler scheduler) {
-            this.scheduler = scheduler;
-            return this;
-        }
-
-        /**
-         * Returns a new pocket instance
-         */
-        @NonNull
-        public Pocket<T> build() {
-            if (name == null) {
-                name = DEFAULT_NAME;
-            }
-            if (gson == null) {
-                gson = new Gson();
-            }
-            if (scheduler == null) {
-                scheduler = Schedulers.io();
-            }
-
-            return new RealPocket<>(context, name, scheduler, gson, clazz);
-        }
-    }
+    Flowable<Pair<String, Object>> updates();
 }

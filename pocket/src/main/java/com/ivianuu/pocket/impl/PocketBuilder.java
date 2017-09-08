@@ -14,26 +14,24 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket;
+package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Type;
-
 /**
- * Serializes and deserializes objects
+ * Access point to build a pocket
  */
-public interface Serializer {
+public final class PocketBuilder {
+
+    private PocketBuilder() {
+        // no instances
+    }
 
     /**
-     * Serializes the value
+     * Returns a new pocket builder
      */
     @NonNull
-    <T> String serialize(@NonNull T value);
-
-    /**
-     * Deserializes the string to the value
-     */
-    @NonNull
-    <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception;
+    public static RealPocketBuilder builder() {
+        return new RealPocketBuilder();
+    }
 }

@@ -1,10 +1,26 @@
-package com.ivianuu.pocket;
+/*
+ * Copyright 2017 Manuel Wrage
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.ivianuu.pocket.impl;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.gson.Gson;
+import com.ivianuu.pocket.Storage;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,28 +36,50 @@ import java.util.List;
 /**
  * Storage implementation
  */
-final class RealStorage<T> implements Storage<T> {
+public final class FileSystemStorage implements Storage {
 
-    private final Context context;
-    private final String dbName;
-    private final Gson gson;
-    private final Class<T> clazz;
-    
-    private String filesDir;
+    private static final String DEFAULT_FILES_DIR = "pocket";
+    private static final String FILE_EXT = ".pt";
+    private static final String BAK_EXT = ".bak";
+
+    private final File filesDir;
     private boolean pocketDirCreated;
-    
-    RealStorage(@NonNull Context context,
-                @NonNull String dbName,
-                @NonNull Gson gson,
-                @NonNull Class<T> clazz) {
-        this.context = context;
-        this.dbName = dbName;
-        this.gson = gson;
-        this.clazz = clazz;
+
+    private FileSystemStorage(@NonNull File filesDir) {
+        this.filesDir = filesDir;
+
+        pocketDirCreated = filesDir.exists();
+    }
+
+    /**
+     * Returns a new file system storage
+     * This will use the default files name
+     */
+    @NonNull
+    public static Storage create(@NonNull Context context) {
+        File filesDir = new File(context.getFilesDir().getPath() + File.separator + DEFAULT_FILES_DIR);
+        return create(filesDir);
+    }
+
+    /**
+     * Returns a new file system storage
+     */
+    @NonNull
+    public static Storage create(@NonNull Context context, @NonNull String name) {
+        File filesDir = new File(context.getFilesDir().getPath() + File.separator + name);
+        return create(filesDir);
+    }
+
+    /**
+     * Returns a new file system storage
+     */
+    @NonNull
+    public static Storage create(@NonNull File files) {
+        return new FileSystemStorage(files);
     }
 
     @Override
-    public void put(@NonNull String key, @NonNull T value) {
+    public void put(@NonNull String key, @NonNull String value) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -66,7 +104,7 @@ final class RealStorage<T> implements Storage<T> {
 
     @Nullable
     @Override
-    public T get(@NonNull String key) {
+    public String get(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -104,9 +142,7 @@ final class RealStorage<T> implements Storage<T> {
     @Override
     public void deleteAll() {
         assertInit();
-
-        final String dbPath = getDbPath(context, dbName);
-        deleteDirectory(dbPath);
+        deleteDirectory(filesDir);
         pocketDirCreated = false;
     }
 
@@ -118,25 +154,16 @@ final class RealStorage<T> implements Storage<T> {
         return originalFile.exists();
     }
 
-    @Override
-    public synchronized long lastModified(@NonNull String key) {
-        assertInit();
-
-        final File originalFile = getOriginalFile(key);
-        return originalFile.exists() ? originalFile.lastModified() : -1;
-    }
-
     @NonNull
     @Override
     public List<String> getAllKeys() {
         assertInit();
 
-        File bookFolder = new File(filesDir);
-        String[] names = bookFolder.list();
+        String[] names = filesDir.list();
         if (names != null) {
             //remove extensions
             for (int i = 0; i < names.length; i++) {
-                names[i] = names[i].replace(".pt", "");
+                names[i] = names[i].replace(FILE_EXT, "");
             }
             return Arrays.asList(names);
         } else {
@@ -145,14 +172,14 @@ final class RealStorage<T> implements Storage<T> {
     }
 
     private File getOriginalFile(String key) {
-        final String tablePath = filesDir + File.separator + key + ".pt";
+        final String tablePath = filesDir.getPath() + File.separator + key + FILE_EXT;
         return new File(tablePath);
     }
-    
-    private void writeTableFile(String key, T value, File originalFile, File backupFile) {
+
+    private void writeTableFile(String key, String value, File originalFile, File backupFile) {
         try {
             FileOutputStream fileStream = new FileOutputStream(originalFile);
-            fileStream.write(gson.toJson(value, clazz).getBytes());
+            fileStream.write(value.getBytes());
             fileStream.flush();
             sync(fileStream);
             fileStream.close(); //also close file stream
@@ -173,27 +200,26 @@ final class RealStorage<T> implements Storage<T> {
         }
     }
 
-    private T readTableFile(String key, File originalFile) {
+    private String readTableFile(String key, File originalFile) {
         try {
             BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(originalFile)));
-            StringBuilder json = new StringBuilder();
+            StringBuilder value = new StringBuilder();
             String line;
             while ((line = r.readLine()) != null) {
-                json.append(line).append('\n');
+                value.append(line).append('\n');
             }
-            T value = gson.fromJson(json.toString(), clazz);
 
             r.close();
-            return value;
+            return value.toString();
         } catch (FileNotFoundException e) {
             // Clean up an unsuccessfully written file
             if (originalFile.exists()) {
                 if (!originalFile.delete()) {
-                    throw new IllegalArgumentException("Couldn't clean up broken/unserializable file "
+                    throw new IllegalArgumentException("Couldn't clean up broken file "
                             + originalFile, e);
                 }
             }
-            String errorMessage = "Couldn't read/deserialize file "
+            String errorMessage = "Couldn't read file "
                     + originalFile + " for table " + key;
             throw new IllegalStateException(errorMessage, e);
         } catch (IOException e) {
@@ -201,35 +227,29 @@ final class RealStorage<T> implements Storage<T> {
         }
     }
 
-    private String getDbPath(Context context, String dbName) {
-        return context.getFilesDir() + File.separator + dbName;
-    }
-
     private void assertInit() {
         if (!pocketDirCreated) {
-            createPaperDir();
+            createPocketDir();
             pocketDirCreated = true;
         }
     }
 
-    private void createPaperDir() {
-        filesDir = getDbPath(context, dbName);
-        if (!new File(filesDir).exists()) {
-            boolean isReady = new File(filesDir).mkdirs();
+    private void createPocketDir() {
+        if (!filesDir.exists()) {
+            boolean isReady = filesDir.mkdirs();
             if (!isReady) {
-                throw new RuntimeException("Couldn't create Pocket dir: " + filesDir);
+                throw new RuntimeException("Couldn't create Pocket dir: " + filesDir.getPath());
             }
         }
     }
 
-    private static void deleteDirectory(String dirPath) {
-        File directory = new File(dirPath);
+    private static void deleteDirectory(File directory) {
         if (directory.exists()) {
             File[] files = directory.listFiles();
             if (null != files) {
                 for (File file : files) {
                     if (file.isDirectory()) {
-                        deleteDirectory(file.toString());
+                        deleteDirectory(file);
                     } else {
                         //noinspection ResultOfMethodCallIgnored
                         file.delete();
@@ -242,7 +262,7 @@ final class RealStorage<T> implements Storage<T> {
     }
 
     private File makeBackupFile(File originalFile) {
-        return new File(originalFile.getPath() + ".bak");
+        return new File(originalFile.getPath() + BAK_EXT);
     }
     
     private static void sync(FileOutputStream stream) {

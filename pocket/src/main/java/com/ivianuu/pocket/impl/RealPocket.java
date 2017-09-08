@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket;
+package com.ivianuu.pocket.impl;
 
-import android.content.Context;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 
-import com.google.gson.Gson;
+import com.ivianuu.pocket.Encryption;
+import com.ivianuu.pocket.Pocket;
+import com.ivianuu.pocket.Serializer;
+import com.ivianuu.pocket.Storage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -46,30 +48,43 @@ import io.reactivex.processors.PublishProcessor;
 /**
  * RealPocket dao
  */
-final class RealPocket<T> implements Pocket<T> {
+final class RealPocket implements Pocket {
 
+    private final Encryption encryption;
+    private final Storage storage;
+    private final Serializer serializer;
     private final Scheduler scheduler;
-    private final Storage<T> storage;
 
     private final PublishProcessor<String> keyChangesProcessor = PublishProcessor.create();
 
-    RealPocket(@NonNull Context context,
-               @NonNull String name,
-               @NonNull Scheduler scheduler,
-               @NonNull Gson gson,
-               @NonNull Class<T> clazz) {
+    RealPocket(@NonNull Encryption encryption,
+               @NonNull Storage storage,
+               @NonNull Serializer serializer,
+               @NonNull Scheduler scheduler) {
+        this.encryption = encryption;
+        this.storage = storage;
+        this.serializer = serializer;
         this.scheduler = scheduler;
-        this.storage = new RealStorage<>(context, name, gson, clazz);
     }
 
     @NonNull
     @Override
-    public Completable put(@NonNull final String key, @NonNull final T value) {
+    public <T> Completable put(@NonNull final String key, @NonNull final T value) {
         return Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
                     public Object call() throws Exception {
-                        storage.put(key, value);
+                        // serialize
+                        String serialized = serializer.serialize(value);
+
+                        // add meta to deserialize without the need to put the class arg
+                        String meta = ClassMetaUtil.pack(serialized, value.getClass());
+
+                        // encrypt
+                        String encrypted = encryption.encrypt(key, meta);
+
+                        // persist
+                        storage.put(key, encrypted);
                         return new Object();
                     }
                 })
@@ -78,18 +93,30 @@ final class RealPocket<T> implements Pocket<T> {
                     public void run() throws Exception {
                         keyChangesProcessor.onNext(key);
                     }
-                })
-                .subscribeOn(scheduler);
+                }).subscribeOn(scheduler);
     }
 
     @NonNull
     @Override
-    public Maybe<T> get(@NonNull final String key) {
+    public <T> Maybe<T> get(@NonNull final String key) {
         return Maybe.create(new MaybeOnSubscribe<T>() {
             @Override
             public void subscribe(MaybeEmitter<T> e) throws Exception {
-                T value = storage.get(key);
-                if (value != null) {
+                // get encrypted data
+                String encrypted = storage.get(key);
+
+                // null check
+                if (encrypted != null) {
+                    // decrypt to meta
+                    String meta = encryption.decrypt(key, encrypted);
+
+                    // retrieve meta values
+                    Pair<String, Class<?>> metaPair = ClassMetaUtil.unpack(meta);
+
+                    // deserialize to the value
+                    T value = serializer.deserialize(metaPair.first, metaPair.second);
+
+                    // notify
                     if (!e.isDisposed()) {
                         e.onSuccess(value);
                     }
@@ -104,16 +131,11 @@ final class RealPocket<T> implements Pocket<T> {
 
     @NonNull
     @Override
-    public Single<T> get(@NonNull final String key, @NonNull final T defaultValue) {
-        return Single.create(new SingleOnSubscribe<T>() {
-            @Override
-            public void subscribe(SingleEmitter<T> e) throws Exception {
-                T value = storage.get(key);
-                if (!e.isDisposed()) {
-                    e.onSuccess(value != null ? value : defaultValue);
-                }
-            }
-        }).subscribeOn(scheduler);
+    public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue) {
+        // TODO: 08.09.2017 fix
+        return (Single<T>) get(key)
+                .defaultIfEmpty(defaultValue)
+                .toSingle();
     }
 
     @CheckResult @NonNull
@@ -166,17 +188,6 @@ final class RealPocket<T> implements Pocket<T> {
 
     @CheckResult @NonNull
     @Override
-    public Single<Long> lastModified(@NonNull final String key) {
-        return Single.fromCallable(new Callable<Long>() {
-            @Override
-            public Long call() throws Exception {
-                return storage.lastModified(key);
-            }
-        }).subscribeOn(scheduler);
-    }
-
-    @CheckResult @NonNull
-    @Override
     public Single<List<String>> getAllKeys() {
         return Single.fromCallable(new Callable<List<String>>() {
             @Override
@@ -188,19 +199,19 @@ final class RealPocket<T> implements Pocket<T> {
 
     @CheckResult @NonNull
     @Override
-    public Single<HashMap<String, T>> getAllValues() {
-        return Single.create(new SingleOnSubscribe<HashMap<String, T>>() {
+    public Single<HashMap<String, Object>> getAllValues() {
+        return Single.create(new SingleOnSubscribe<HashMap<String, Object>>() {
             @Override
-            public void subscribe(SingleEmitter<HashMap<String, T>> e) throws Exception {
+            public void subscribe(SingleEmitter<HashMap<String, Object>> e) throws Exception {
                 List<String> keys = getAllKeys().blockingGet();
-                HashMap<String, T> map = new HashMap<>();
+                HashMap<String, Object> map = new HashMap<>();
                 for (String key : keys) {
                     if (e.isDisposed()) {
                         // stop if the observer is not interested anymore
                         return;
                     }
 
-                    T value = get(key).blockingGet();
+                    Object value = get(key).blockingGet();
                     map.put(key, value);
                 }
 
@@ -219,7 +230,7 @@ final class RealPocket<T> implements Pocket<T> {
 
     @CheckResult @NonNull
     @Override
-    public Flowable<T> latest(@NonNull final String key) {
+    public <T> Flowable<T> latest(@NonNull final String key) {
         return keyChanges()
                 .filter(new Predicate<String>() {
                     @Override
@@ -238,15 +249,15 @@ final class RealPocket<T> implements Pocket<T> {
 
     @CheckResult @NonNull
     @Override
-    public Flowable<Pair<String, T>> updates() {
+    public Flowable<Pair<String, Object>> updates() {
         return keyChanges()
-                .flatMapMaybe(new Function<String, MaybeSource<? extends Pair<String, T>>>() {
+                .flatMapMaybe(new Function<String, MaybeSource<? extends Pair<String, Object>>>() {
                     @Override
-                    public MaybeSource<? extends Pair<String, T>> apply(final String key) throws Exception {
+                    public MaybeSource<? extends Pair<String, Object>> apply(final String key) throws Exception {
                         return get(key)
-                                .map(new Function<T, Pair<String,T>>() {
+                                .map(new Function<Object, Pair<String, Object>>() {
                                     @Override
-                                    public Pair<String, T> apply(T value) throws Exception {
+                                    public Pair<String, Object> apply(Object value) throws Exception {
                                         return new Pair<>(key, value);
                                     }
                                 });

@@ -18,22 +18,20 @@ package com.ivianuu.pocket;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Type;
-
 /**
- * Serializes and deserializes objects
+ * Encrypts and decrypts data
  */
-public interface Serializer {
+public interface Encryption {
 
     /**
-     * Serializes the value
+     * Returns the encrypted value
      */
     @NonNull
-    <T> String serialize(@NonNull T value);
+    String encrypt(@NonNull String key, @NonNull String value);
 
     /**
-     * Deserializes the string to the value
+     * Returns the decrypted string
      */
     @NonNull
-    <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception;
+    String decrypt(@NonNull String key, @NonNull String encrypted);
 }

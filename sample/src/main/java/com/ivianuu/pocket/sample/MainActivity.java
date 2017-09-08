@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.ivianuu.pocket.Pocket;
+import com.ivianuu.pocket.impl.FileSystemStorage;
+import com.ivianuu.pocket.impl.GsonSerializer;
+import com.ivianuu.pocket.impl.PocketBuilder;
 
 import io.reactivex.functions.Consumer;
 
@@ -19,17 +22,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Pocket<Pojooo> stringPocket = new Pocket.Builder<>(this, Pojooo.class)
+        final Pocket stringPocket = PocketBuilder.builder()
+                .encryption(new Base64Encryption())
+                .serializer(GsonSerializer.create())
+                .storage(FileSystemStorage.create(this))
                 .build();
 
         stringPocket.updates()
-                .subscribe(new Consumer<Pair<String, Pojooo>>() {
+                .subscribe(new Consumer<Pair<String, Object>>() {
                     @Override
-                    public void accept(Pair<String, Pojooo> pair) throws Exception {
+                    public void accept(Pair<String, Object> pair) throws Exception {
                         Log.d("testtt", pair.first + " updated to " + pair.second.toString());
                     }
                 });
-
 
         final Handler handler = new Handler();
         handler.post(new Runnable() {
@@ -39,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                 Pojooo pojooo = new Pojooo("hannes " + count, count, 3.14f * count);
                 stringPocket.put("my_key" + count, pojooo)
                         .subscribe();
-                handler.postDelayed(this, 10);
+                handler.postDelayed(this, 100);
             }
         });
     }

@@ -14,51 +14,55 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket;
+package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.ivianuu.pocket.Serializer;
+
+import java.lang.reflect.Type;
 
 /**
  * Gson serializer implementation
  */
-public class GsonSerializer<T> implements Serializer<T> {
+public class GsonSerializer implements Serializer {
 
-    private final Class<T> clazz;
     private final Gson gson;
 
-    private GsonSerializer(Class<T> clazz, Gson gson) {
-        this.clazz = clazz;
+    private GsonSerializer(Gson gson) {
         this.gson = gson;
     }
 
     /**
-     * Returns a gson serializer for the passed class
+     * Returns a gson serializer
      * This will create a new gson instance
      */
     @NonNull
-    public static <T> Serializer<T> create(@NonNull Class<T> clazz) {
-        return create(clazz, new Gson());
+    public static <T> Serializer create() {
+        return create(new Gson());
     }
 
     /**
-     * Returns a gson serializer for the passed class
+     * Returns a gson serializer with a custom gson instance
      */
     @NonNull
-    public static <T> Serializer<T> create(@NonNull Class<T> clazz, @NonNull Gson gson) {
-        return new GsonSerializer<>(clazz, gson);
+    public static Serializer create(@NonNull Gson gson) {
+        return new GsonSerializer(gson);
     }
 
     @NonNull
     @Override
-    public String serialize(@NonNull T value) {
-        return gson.toJson(value, clazz);
+    public <T> String serialize(@NonNull T value) {
+        return gson.toJson(value);
     }
 
     @NonNull
     @Override
-    public T deserialize(@NonNull String serialized) {
-        return gson.fromJson(serialized, clazz);
+    public <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception {
+        TypeAdapter<T> typeAdapter = (TypeAdapter<T>) gson.getAdapter(TypeToken.get(type));
+        return typeAdapter.fromJson(serialized);
     }
 }

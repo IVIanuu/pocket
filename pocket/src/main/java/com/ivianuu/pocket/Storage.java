@@ -8,18 +8,18 @@ import java.util.List;
 /**
  * Storage
  */
-public interface Storage<T> {
+public interface Storage {
 
     /**
      * Inserts the value
      */
-    void put(@NonNull String key, @NonNull T value);
+    void put(@NonNull String key, @NonNull String value);
 
     /**
      * Returns the value of the key or null
      */
     @Nullable
-    T get(@NonNull String key);
+    String get(@NonNull String key);
 
     /**
      * Deletes the key
@@ -35,11 +35,6 @@ public interface Storage<T> {
      * Returns whether the storage contains the key
      */
     boolean contains(@NonNull String key);
-
-    /**
-     * Returns last modification time
-     */
-    long lastModified(@NonNull String key);
 
     /**
      * Returns all keys in the path

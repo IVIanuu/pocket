@@ -1,2 +1,2 @@
 # Pocket
-Simple db powered by RxJava and Gson
+Simple modular db powered by RxJava

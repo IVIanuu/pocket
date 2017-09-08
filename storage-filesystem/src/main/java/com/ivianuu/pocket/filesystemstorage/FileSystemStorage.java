@@ -22,6 +22,7 @@ import android.support.annotation.Nullable;
 
 import com.ivianuu.pocket.Storage;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +48,6 @@ public final class FileSystemStorage implements Storage {
 
     private FileSystemStorage(File filesDir) {
         this.filesDir = filesDir;
-
         pocketDirCreated = filesDir.exists();
     }
 
@@ -81,7 +81,7 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public void put(@NonNull String key, @NonNull String value) {
+    public synchronized void put(@NonNull String key, @NonNull String value) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -106,7 +106,7 @@ public final class FileSystemStorage implements Storage {
 
     @Nullable
     @Override
-    public String get(@NonNull String key) {
+    public synchronized String get(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -126,7 +126,7 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public void delete(@NonNull String key) {
+    public synchronized void delete(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -142,14 +142,14 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public void deleteAll() {
+    public synchronized void deleteAll() {
         assertInit();
         deleteDirectory(filesDir);
         pocketDirCreated = false;
     }
 
     @Override
-    public boolean contains(@NonNull String key) {
+    public synchronized boolean contains(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -158,7 +158,7 @@ public final class FileSystemStorage implements Storage {
 
     @NonNull
     @Override
-    public List<String> getAllKeys() {
+    public synchronized List<String> getAllKeys() {
         assertInit();
 
         String[] names = filesDir.list();
@@ -180,11 +180,10 @@ public final class FileSystemStorage implements Storage {
 
     private void writeTableFile(String key, String value, File originalFile, File backupFile) {
         try {
-            FileOutputStream fileStream = new FileOutputStream(originalFile);
-            fileStream.write(value.getBytes());
-            fileStream.flush();
-            sync(fileStream);
-            fileStream.close(); //also close file stream
+            BufferedOutputStream outputStream = new BufferedOutputStream(new FileOutputStream(originalFile));
+            outputStream.write(value.getBytes());
+            outputStream.flush();
+            outputStream.close(); //also close file stream
 
             // Writing was successful, delete the backup file if there is one.
             //noinspection ResultOfMethodCallIgnored
@@ -204,14 +203,14 @@ public final class FileSystemStorage implements Storage {
 
     private String readTableFile(String key, File originalFile) {
         try {
-            BufferedReader r = new BufferedReader(new InputStreamReader(new FileInputStream(originalFile)));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(originalFile)));
             StringBuilder value = new StringBuilder();
             String line;
-            while ((line = r.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 value.append(line).append('\n');
             }
 
-            r.close();
+            reader.close();
             return value.toString();
         } catch (FileNotFoundException e) {
             // Clean up an unsuccessfully written file
@@ -265,15 +264,5 @@ public final class FileSystemStorage implements Storage {
 
     private File makeBackupFile(File originalFile) {
         return new File(originalFile.getPath() + BAK_EXT);
-    }
-
-    private static void sync(FileOutputStream stream) {
-        //noinspection EmptyCatchBlock
-        try {
-            if (stream != null) {
-                stream.getFD().sync();
-            }
-        } catch (IOException e) {
-        }
     }
 }

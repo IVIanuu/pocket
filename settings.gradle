@@ -1,1 +1,1 @@
-include ':sample', ':pocket', ':serializer-gson', ':storage-filesystem', ':cache-lru', ':storage-sharedpreferences', ':encryption-base64', ':pocket-kotlin'
+include ':sample', ':pocket', ':serializer-gson', ':storage-filesystem', ':cache-lru', ':storage-sharedpreferences', ':encryption-base64', ':pocket-kotlin', ':serializer-moshi'

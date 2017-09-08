@@ -18,7 +18,7 @@ package com.ivianuu.pocket;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
-import android.support.v4.util.Pair;
+import android.util.Pair;
 
 import java.util.HashMap;
 import java.util.List;

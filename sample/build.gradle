@@ -16,6 +16,12 @@ dependencies {
     // Pocket
     implementation project(':pocket')
 
+    // Gson Serializer
+    implementation project(':serializer-gson')
+
+    // Filesystem storage
+    implementation project(':storage-filesystem')
+
     // Android support
     implementation 'com.android.support:appcompat-v7:26.0.2'
 }

@@ -1,1 +1,1 @@
-include ':sample', ':pocket'
+include ':sample', ':pocket', ':serializer-gson', ':storage-filesystem'

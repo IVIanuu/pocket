@@ -2,13 +2,13 @@ package com.ivianuu.pocket.sample;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.Pair;
 
 import com.ivianuu.pocket.Pocket;
-import com.ivianuu.pocket.impl.FileSystemStorage;
-import com.ivianuu.pocket.impl.GsonSerializer;
+import com.ivianuu.pocket.filesystemstorage.FileSystemStorage;
+import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final Pocket stringPocket = PocketBuilder.builder()
-                .encryption(new Base64Encryption())
                 .serializer(GsonSerializer.create())
                 .storage(FileSystemStorage.create(this))
                 .build();

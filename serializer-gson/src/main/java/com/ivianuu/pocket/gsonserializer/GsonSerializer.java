@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket.impl;
+package com.ivianuu.pocket.gsonserializer;
 
 import android.support.annotation.NonNull;
 
@@ -28,7 +28,7 @@ import java.lang.reflect.Type;
 /**
  * Gson serializer implementation
  */
-public class GsonSerializer implements Serializer {
+public final class GsonSerializer implements Serializer {
 
     private final Gson gson;
 
@@ -41,7 +41,7 @@ public class GsonSerializer implements Serializer {
      * This will create a new gson instance
      */
     @NonNull
-    public static <T> Serializer create() {
+    public static Serializer create() {
         return create(new Gson());
     }
 

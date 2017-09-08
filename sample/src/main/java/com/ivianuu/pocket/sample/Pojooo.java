@@ -25,9 +25,7 @@ public class Pojooo {
     private int age;
     private float skill;
 
-    public Pojooo() {
-
-    }
+    public Pojooo() {}
 
     public Pojooo(String name, int age, float skill) {
         this.name = name;

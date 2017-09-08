@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket.impl;
+package com.ivianuu.pocket.filesystemstorage;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -45,7 +45,7 @@ public final class FileSystemStorage implements Storage {
     private final File filesDir;
     private boolean pocketDirCreated;
 
-    private FileSystemStorage(@NonNull File filesDir) {
+    private FileSystemStorage(File filesDir) {
         this.filesDir = filesDir;
 
         pocketDirCreated = filesDir.exists();
@@ -266,7 +266,7 @@ public final class FileSystemStorage implements Storage {
     private File makeBackupFile(File originalFile) {
         return new File(originalFile.getPath() + BAK_EXT);
     }
-    
+
     private static void sync(FileOutputStream stream) {
         //noinspection EmptyCatchBlock
         try {
@@ -277,4 +277,3 @@ public final class FileSystemStorage implements Storage {
         }
     }
 }
-

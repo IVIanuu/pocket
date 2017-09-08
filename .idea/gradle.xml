@@ -10,6 +10,8 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/pocket" />
             <option value="$PROJECT_DIR$/sample" />
+            <option value="$PROJECT_DIR$/serializer-gson" />
+            <option value="$PROJECT_DIR$/storage-filesystem" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

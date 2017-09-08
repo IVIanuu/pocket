@@ -46,6 +46,7 @@ final class NoOpCache implements Cache {
     @Nullable
     @Override
     public <T> T get(@NonNull String key) {
+        // always return null
         return null;
     }
 

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         pocket = PocketBuilder.builder()
-                .cache(LruCache.create(5))
+                .cache(LruCache.create(Integer.MAX_VALUE))
                 .encryption(Base64Encryption.create())
                 .serializer(GsonSerializer.create())
                 .storage(SharedPreferencesStorage.create(this))

@@ -19,8 +19,6 @@ package com.ivianuu.pocket.gsonserializer;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
-import com.google.gson.reflect.TypeToken;
 import com.ivianuu.pocket.Serializer;
 
 import java.lang.reflect.Type;
@@ -62,7 +60,6 @@ public final class GsonSerializer implements Serializer {
     @NonNull
     @Override
     public <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception {
-        TypeAdapter<T> typeAdapter = (TypeAdapter<T>) gson.getAdapter(TypeToken.get(type));
-        return typeAdapter.fromJson(serialized);
+        return gson.fromJson(serialized, type);
     }
 }

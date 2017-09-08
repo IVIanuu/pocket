@@ -27,11 +27,12 @@ import com.ivianuu.pocket.Cache;
 public final class LruCache implements Cache {
 
     private final android.support.v4.util.LruCache<String, Object> lruCache;
-    private final SizePredicate sizePredicate;
+
+    private LruCache(android.support.v4.util.LruCache<String, Object> lruCache) {
+        this.lruCache = lruCache;
+    }
 
     private LruCache(int maxSize, final SizePredicate sizePredicate) {
-        this.sizePredicate = sizePredicate;
-
         this.lruCache = new android.support.v4.util.LruCache<String, Object>(maxSize) {
             @Override
             protected int sizeOf(String key, Object value) {
@@ -59,6 +60,14 @@ public final class LruCache implements Cache {
     @NonNull
     public static Cache create(int maxSize, @Nullable SizePredicate sizePredicate) {
         return new LruCache(maxSize, sizePredicate);
+    }
+
+    /**
+     * Returns a new pocket lru cache
+     */
+    @NonNull
+    public static Cache create(android.support.v4.util.LruCache<String, Object> lruCache) {
+        return new LruCache(lruCache);
     }
 
     @Override

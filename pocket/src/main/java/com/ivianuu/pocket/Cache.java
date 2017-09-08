@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Cache interface
+ * Pocket cache
  */
 public interface Cache {
 

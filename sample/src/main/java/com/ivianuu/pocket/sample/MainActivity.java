@@ -11,6 +11,9 @@ import com.ivianuu.pocket.impl.FileSystemStorage;
 import com.ivianuu.pocket.impl.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,8 +44,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 count++;
-                Pojooo pojooo = new Pojooo("hannes " + count, count, 3.14f * count);
-                stringPocket.put("my_key" + count, pojooo)
+                List<Pojooo> pojooos = new ArrayList<>();
+                for (int i = 0; i < count; i++) {
+                    Pojooo pojooo = new Pojooo("hannes " + count, count, 3.14f * count);
+                    pojooos.add(pojooo);
+                }
+                stringPocket.put("my_key" + count, pojooos)
                         .subscribe();
                 handler.postDelayed(this, 100);
             }

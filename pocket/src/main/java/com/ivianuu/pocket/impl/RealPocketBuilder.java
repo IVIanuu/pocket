@@ -31,8 +31,6 @@ import io.reactivex.schedulers.Schedulers;
  */
 public final class RealPocketBuilder {
 
-    private final String DEFAULT_NAME = "pocket";
-
     RealPocketBuilder() {}
 
     private Encryption encryption;

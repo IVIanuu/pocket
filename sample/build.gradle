@@ -24,4 +24,5 @@ dependencies {
 
     // Android support
     implementation 'com.android.support:appcompat-v7:26.0.2'
+    implementation 'com.android.support:recyclerview-v7:26.0.2'
 }

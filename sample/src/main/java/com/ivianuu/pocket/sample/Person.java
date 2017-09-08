@@ -19,46 +19,22 @@ package com.ivianuu.pocket.sample;
 /**
  * @author Manuel Wrage (IVIanuu)
  */
-public class Pojooo {
+public class Person {
 
     private String name;
-    private int age;
-    private float skill;
 
-    public Pojooo() {}
+    public Person() {}
 
-    public Pojooo(String name, int age, float skill) {
+    public Person(String name) {
         this.name = name;
-        this.age = age;
-        this.skill = skill;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public float getSkill() {
-        return skill;
-    }
-
-    public void setSkill(float skill) {
-        this.skill = skill;
-    }
-
     @Override
     public String toString() {
-        return "name: " + name + " age: " + age + " skill: " + skill;
+        return "name: " + name;
     }
 }

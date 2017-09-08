@@ -57,7 +57,8 @@ public final class FileSystemStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context) {
-        File filesDir = new File(context.getFilesDir().getPath() + File.separator + DEFAULT_FILES_DIR);
+        File filesDir = new File(
+                context.getApplicationContext().getFilesDir().getPath() + File.separator + DEFAULT_FILES_DIR);
         return create(filesDir);
     }
 
@@ -66,7 +67,8 @@ public final class FileSystemStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context, @NonNull String name) {
-        File filesDir = new File(context.getFilesDir().getPath() + File.separator + name);
+        File filesDir = new File(
+                context.getApplicationContext().getFilesDir().getPath() + File.separator + name);
         return create(filesDir);
     }
 

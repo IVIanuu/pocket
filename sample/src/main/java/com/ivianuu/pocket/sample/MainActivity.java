@@ -13,7 +13,7 @@ import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.base64encryption.Base64Encryption;
 import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
-import com.ivianuu.pocket.lrucache.PocketLruCache;
+import com.ivianuu.pocket.lrucache.LruCache;
 import com.ivianuu.pocket.sharedpreferencesstorage.SharedPreferencesStorage;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         pocket = PocketBuilder.builder()
-                .cache(PocketLruCache.create(5))
+                .cache(LruCache.create(5))
                 .encryption(Base64Encryption.create())
                 .serializer(GsonSerializer.create())
                 .storage(SharedPreferencesStorage.create(this))

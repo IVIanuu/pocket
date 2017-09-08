@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Storage
  */
-interface Storage<T> {
+public interface Storage<T> {
 
     /**
      * Inserts the value

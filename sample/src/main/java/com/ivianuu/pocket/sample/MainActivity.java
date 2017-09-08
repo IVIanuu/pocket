@@ -1,9 +1,9 @@
 package com.ivianuu.pocket.sample;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.ivianuu.pocket.Pocket;
@@ -19,7 +19,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final Pocket<Pojooo> stringPocket = new Pocket.Builder<>(this, Pojooo.class).build();
+        final Pocket<Pojooo> stringPocket = new Pocket.Builder<>(this, Pojooo.class)
+                .build();
 
         stringPocket.updates()
                 .subscribe(new Consumer<Pair<String, Pojooo>>() {

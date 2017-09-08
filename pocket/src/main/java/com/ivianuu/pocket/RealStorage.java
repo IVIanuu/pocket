@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Store implementation
+ * Storage implementation
  */
 final class RealStorage<T> implements Storage<T> {
 

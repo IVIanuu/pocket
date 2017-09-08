@@ -35,9 +35,9 @@ public final class RealPocketBuilder {
 
     private Cache cache;
     private Encryption encryption;
-    private Storage storage;
-    private Serializer serializer;
     private Scheduler scheduler;
+    private Serializer serializer;
+    private Storage storage;
 
     /**
      * Sets the cache
@@ -58,11 +58,11 @@ public final class RealPocketBuilder {
     }
 
     /**
-     * Sets the storage
+     * The default scheduler
      */
     @NonNull
-    public RealPocketBuilder storage(@NonNull Storage storage) {
-        this.storage = storage;
+    public RealPocketBuilder scheduler(@NonNull Scheduler scheduler) {
+        this.scheduler = scheduler;
         return this;
     }
 
@@ -76,11 +76,11 @@ public final class RealPocketBuilder {
     }
 
     /**
-     * The default scheduler
+     * Sets the storage
      */
     @NonNull
-    public RealPocketBuilder scheduler(@NonNull Scheduler scheduler) {
-        this.scheduler = scheduler;
+    public RealPocketBuilder storage(@NonNull Storage storage) {
+        this.storage = storage;
         return this;
     }
 

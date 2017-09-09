@@ -11,10 +11,10 @@ import android.widget.Toast;
 
 import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.base64encryption.Base64Encryption;
+import com.ivianuu.pocket.filesystemstorage.FileSystemStorage;
 import com.ivianuu.pocket.impl.PocketBuilder;
 import com.ivianuu.pocket.lrucache.LruCache;
 import com.ivianuu.pocket.moshiserializer.MoshiSerializer;
-import com.ivianuu.pocket.sharedpreferencesstorage.SharedPreferencesStorage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 .cache(LruCache.create(Integer.MAX_VALUE))
                 .encryption(Base64Encryption.create())
                 .serializer(MoshiSerializer.create())
-                .storage(SharedPreferencesStorage.create(this))
+                .storage(FileSystemStorage.create(this))
                 .scheduler(Schedulers.io())
                 .build();
 

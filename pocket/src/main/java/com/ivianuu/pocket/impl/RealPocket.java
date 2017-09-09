@@ -294,17 +294,18 @@ final class RealPocket implements Pocket {
 
     @Override
     public <T> Single<Map<String, T>> getAll(final Type type) {
-        return getAll()
-                .map(new Function<Map<String,?>, Map<String, T>>() {
+        return getAllKeys()
+                .map(new Function<List<String>, Map<String, T>>() {
                     @Override
-                    public Map<String, T> apply(Map<String, ?> map) throws Exception {
-                        Map<String, T> typeMap = new LinkedHashMap<>();
-                        for (Map.Entry<String, ?> entry : map.entrySet()) {
-                            if (entry.getValue().getClass() == type) {
-                                typeMap.put(entry.getKey(), (T) entry.getValue());
-                            }
+                    public Map<String, T> apply(List<String> keys) throws Exception {
+                        Map<String, T> map = new LinkedHashMap<>();
+                        for (String key : keys) {
+                            try {
+                                map.put(key, (T) get(key, type).blockingGet());
+                            } catch (Exception ignored) {}
                         }
-                        return typeMap;
+
+                        return map;
                     }
                 });
     }

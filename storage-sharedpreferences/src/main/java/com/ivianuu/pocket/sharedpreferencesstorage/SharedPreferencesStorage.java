@@ -82,4 +82,9 @@ public final class SharedPreferencesStorage implements Storage {
     public List<String> getAllKeys() {
         return new ArrayList<>(sharedPreferences.getAll().keySet());
     }
+
+    @Override
+    public int getCount() {
+        return sharedPreferences.getAll().size();
+    }
 }

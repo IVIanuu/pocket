@@ -161,16 +161,22 @@ public final class FileSystemStorage implements Storage {
     public List<String> getAllKeys() {
         assertInit();
 
-        String[] names = filesDir.list();
-        if (names != null) {
+        String[] files = filesDir.list();
+        if (files != null) {
             //remove extensions
-            for (int i = 0; i < names.length; i++) {
-                names[i] = names[i].replace(FILE_EXT, "");
+            for (int i = 0; i < files.length; i++) {
+                files[i] = files[i].replace(FILE_EXT, "");
             }
-            return Arrays.asList(names);
+            return Arrays.asList(files);
         } else {
             return new ArrayList<>();
         }
+    }
+
+    @Override
+    public int getCount() {
+        String[] files = filesDir.list();
+        return files != null ? files.length : 0;
     }
 
     private File getOriginalFile(String key) {

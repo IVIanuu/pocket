@@ -24,6 +24,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 import static io.reactivex.android.schedulers.AndroidSchedulers.mainThread;
 
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 .encryption(Base64Encryption.create())
                 .serializer(MoshiSerializer.create())
                 .storage(SharedPreferencesStorage.create(this))
+                .scheduler(Schedulers.io())
                 .build();
 
         final EditText personInput = findViewById(R.id.person_input);

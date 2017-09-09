@@ -105,13 +105,13 @@ final class RealPocket implements Pocket {
         return completable;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
         return get(key, (Type) clazz);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Type type) {
         Maybe<T> maybe;
@@ -161,13 +161,13 @@ final class RealPocket implements Pocket {
         return maybe;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
         return get(key, defaultValue, (Type) clazz);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type) {
         Single<T> single = (Single<T>) get(key, type)
@@ -207,7 +207,7 @@ final class RealPocket implements Pocket {
         return completable;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Completable deleteAll() {
         // first get all keys
@@ -233,7 +233,7 @@ final class RealPocket implements Pocket {
         return completable;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<Boolean> contains(@NonNull final String key) {
         Single<Boolean> single = Single.fromCallable(new Callable<Boolean>() {
@@ -264,7 +264,7 @@ final class RealPocket implements Pocket {
         return single;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public Single<Map<String, ?>> getAll() {
         Single<Map<String, ?>> single = getAllKeys()
@@ -289,6 +289,22 @@ final class RealPocket implements Pocket {
 
     @CheckResult @NonNull
     @Override
+    public Single<Integer> getCount() {
+        Single<Integer> single = Single.fromCallable(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return storage.getCount();
+            }
+        });
+        if (scheduler != null) {
+            single = single.subscribeOn(scheduler);
+        }
+
+        return single;
+    }
+
+    @CheckResult @NonNull
+    @Override
     public Flowable<String> keyChanges() {
         Flowable<String> flowable = keyChangesProcessor.share();
         if (scheduler != null) {
@@ -297,13 +313,13 @@ final class RealPocket implements Pocket {
         return flowable;
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
         return stream(key, (Type) clazz);
     }
 
-    @NonNull
+    @CheckResult @NonNull
     @Override
     public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in

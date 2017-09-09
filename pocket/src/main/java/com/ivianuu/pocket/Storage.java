@@ -42,4 +42,9 @@ public interface Storage {
     @NonNull
     List<String> getAllKeys();
 
+    /**
+     * Returns the count of all entries
+     */
+    int getCount();
+
 }

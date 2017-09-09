@@ -34,7 +34,6 @@ public final class LruCache implements Cache {
 
     /**
      * Returns a new pocket lru cache
-     * This will use 1 as the size for every item
      */
     @NonNull
     public static Cache create(int maxSize) {

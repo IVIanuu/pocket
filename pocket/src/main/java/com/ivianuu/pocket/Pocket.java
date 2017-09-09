@@ -96,6 +96,12 @@ public interface Pocket {
     Single<Map<String, ?>> getAll();
 
     /**
+     * Returns the count of all entries
+     */
+    @CheckResult @NonNull
+    Single<Integer> getCount();
+
+    /**
      * Emits on key changes
      */
     @CheckResult @NonNull

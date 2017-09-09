@@ -16,9 +16,10 @@ import com.ivianuu.pocket.lrucache.LruCache;
 import com.ivianuu.pocket.moshiserializer.MoshiSerializer;
 import com.ivianuu.pocket.sharedpreferencesstorage.SharedPreferencesStorage;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import io.reactivex.ObservableSource;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
@@ -116,21 +117,15 @@ public class MainActivity extends AppCompatActivity {
             loadData.dispose();
         }
 
-        loadData = pocket.getAllKeys()
-                .toObservable()
-                .flatMapIterable(new Function<List<String>, Iterable<String>>() {
+        loadData = pocket.getAll(Person.class)
+                .map(new Function<Map<String,Person>, List<Person>>() {
                     @Override
-                    public Iterable<String> apply(List<String> strings) throws Exception {
-                        return strings;
+                    public List<Person> apply(Map<String, Person> map) throws Exception {
+                        List<Person> people = new ArrayList<>();
+                        people.addAll(map.values());
+                        return people;
                     }
                 })
-                .concatMap(new Function<String, ObservableSource<Person>>() {
-                    @Override
-                    public ObservableSource<Person> apply(String s) throws Exception {
-                        return pocket.get(s, Person.class).toObservable();
-                    }
-                })
-                .toList()
                 .observeOn(mainThread())
                 .subscribe(new Consumer<List<Person>>() {
                     @Override

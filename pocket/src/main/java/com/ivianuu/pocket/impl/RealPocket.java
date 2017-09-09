@@ -27,7 +27,7 @@ import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -271,7 +271,7 @@ final class RealPocket implements Pocket {
                 .map(new Function<List<String>, Map<String, ?>>() {
                     @Override
                     public Map<String, Object> apply(List<String> keys) throws Exception {
-                        Map<String, Object> map = new HashMap<>();
+                        Map<String, Object> map = new LinkedHashMap<>();
                         for (String key : keys) {
                             Object value = get(key, Object.class).blockingGet();
                             map.put(key, value);

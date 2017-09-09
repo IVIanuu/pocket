@@ -76,8 +76,8 @@ public final class FileSystemStorage implements Storage {
      * Returns a new file system storage
      */
     @NonNull
-    public static Storage create(@NonNull File files) {
-        return new FileSystemStorage(files);
+    public static Storage create(@NonNull File filesDir) {
+        return new FileSystemStorage(filesDir);
     }
 
     @Override
@@ -220,9 +220,8 @@ public final class FileSystemStorage implements Storage {
                             + originalFile, e);
                 }
             }
-            String errorMessage = "Couldn't read file "
-                    + originalFile + " for table " + key;
-            throw new IllegalStateException(errorMessage, e);
+            throw new IllegalStateException("Couldn't read file " + originalFile
+                    + " for table " + key, e);
         } catch (IOException e) {
             throw new IllegalStateException(e.getMessage());
         }

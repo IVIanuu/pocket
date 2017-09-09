@@ -164,13 +164,16 @@ final class RealPocket implements Pocket {
     @CheckResult @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Class<T> clazz) {
-        return null;
+        return getOptional(key, (Type) clazz);
     }
 
     @CheckResult @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type) {
-        return null;
+        return get(key, type)
+                .map(value -> Option.present((T) value))
+                .switchIfEmpty(Maybe.just(Option.absent()))
+                .toSingle();
     }
 
     @CheckResult @NonNull

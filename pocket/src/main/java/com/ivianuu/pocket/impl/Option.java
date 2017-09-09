@@ -17,6 +17,7 @@
 package com.ivianuu.pocket.impl;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 /**
  * Option
@@ -43,6 +44,15 @@ public final class Option<T> {
     @NonNull
     static <T> Option<T> absent() {
         return new Option<>(null);
+    }
+
+    /**
+     * Returns the value
+     * Only non null if present returns true
+     */
+    @Nullable
+    public T getValue() {
+        return value;
     }
 
     /**

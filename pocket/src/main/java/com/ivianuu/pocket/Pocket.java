@@ -92,11 +92,13 @@ public interface Pocket {
     /**
      * Returns a map of all all keys with the provided value type
      */
+    @CheckResult @NonNull
     <T> Single<Map<String, T>> getAll(Class<T> clazz);
 
     /**
      * Returns a map of all all keys with the provided value type
      */
+    @CheckResult @NonNull
     <T> Single<Map<String, T>> getAll(Type type);
 
     /**
@@ -110,6 +112,18 @@ public interface Pocket {
      */
     @CheckResult @NonNull
     Flowable<String> keyChanges();
+
+    /**
+     * Emits on key changes
+     */
+    @CheckResult @NonNull
+    <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz);
+
+    /**
+     * Emits on key changes
+     */
+    @CheckResult @NonNull
+    <T> Flowable<Map.Entry<String, T>> stream(@NonNull Type type);
 
     /**
      * Emits on value changes and on first subscribe

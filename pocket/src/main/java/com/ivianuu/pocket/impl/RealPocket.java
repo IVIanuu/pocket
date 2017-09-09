@@ -27,6 +27,7 @@ import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
 import java.lang.reflect.Type;
+import java.util.AbstractMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,11 +265,13 @@ final class RealPocket implements Pocket {
         return single;
     }
 
+    @CheckResult @NonNull
     @Override
     public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
         return getAll((Type) clazz);
     }
 
+    @CheckResult @NonNull
     @Override
     public <T> Single<Map<String, T>> getAll(final Type type) {
         Single<Map<String, T>> single = getAllKeys()
@@ -321,6 +324,35 @@ final class RealPocket implements Pocket {
 
     @CheckResult @NonNull
     @Override
+    public <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz) {
+        return stream((Type) clazz);
+    }
+
+    @CheckResult @NonNull
+    @Override
+    public <T> Flowable<Map.Entry<String, T>> stream(@NonNull final Type type) {
+        Flowable<Map.Entry<String, T>> flowable = keyChanges()
+                .flatMapMaybe(new Function<String, MaybeSource<Map.Entry<String, T>>>() {
+                    @Override
+                    public MaybeSource<Map.Entry<String, T>> apply(String key) throws Exception {
+                        try {
+                            T value = (T) get(key, type).blockingGet();
+                            Map.Entry<String, T> entry = new AbstractMap.SimpleEntry<>(key, value);
+                            return Maybe.just(entry);
+                        } catch (Exception ignored) {
+                            return Maybe.empty();
+                        }
+                    }
+                });
+        if (scheduler != null) {
+            flowable = flowable.subscribeOn(scheduler);
+        }
+
+        return flowable;
+    }
+
+    @CheckResult @NonNull
+    @Override
     public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
         return stream(key, (Type) clazz);
     }
@@ -334,14 +366,19 @@ final class RealPocket implements Pocket {
                 .filter(new Predicate<String>() {
                     @Override
                     public boolean test(String changedKey) throws Exception {
-                        return changedKey.equals(key);
+                        return key.equals(changedKey);
                     }
                 })
-                .startWith("") // Dummy value to trigger initial load.
-                .flatMapMaybe(new Function<String, MaybeSource<? extends T>>() {
+                .startWith("") // trigger initial load
+                .flatMapMaybe(new Function<String, MaybeSource<T>>() {
                     @Override
-                    public MaybeSource<? extends T> apply(String s) throws Exception {
-                        return get(key, type);
+                    public MaybeSource<T> apply(String key) throws Exception {
+                        try {
+                            T value = (T) get(key, type).blockingGet();
+                            return Maybe.just(value);
+                        } catch (Exception ignored) {
+                            return Maybe.empty();
+                        }
                     }
                 });
         if (scheduler != null) {

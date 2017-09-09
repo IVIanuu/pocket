@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,6 +53,22 @@ public class MainActivity extends AppCompatActivity {
         final EditText personInput = findViewById(R.id.person_input);
 
         Button addButton = findViewById(R.id.add_button);
+
+        pocket.stream("kp", Person.class)
+                .subscribe(new Consumer<Person>() {
+                    @Override
+                    public void accept(Person person) throws Exception {
+                        Log.d("testtt", "kp changed " + person);
+                    }
+                });
+
+        pocket.stream(Person.class)
+                .subscribe(new Consumer<Map.Entry<String, Person>>() {
+                    @Override
+                    public void accept(Map.Entry<String, Person> entry) throws Exception {
+                        Log.d("testtt", "entry changed " + entry.getKey() + " " + entry.getValue());
+                    }
+                });
 
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -301,6 +301,7 @@ final class RealPocket implements Pocket {
     public <T> Flowable<Map.Entry<String, T>> stream(@NonNull final Type type) {
         Flowable<Map.Entry<String, T>> flowable = keyChanges()
                 .flatMapMaybe(key -> {
+                    // TODO: 09.09.2017 is there a better way ?
                     try {
                         T value = this.<T>get(key, type).blockingGet();
                         Map.Entry<String, T> entry = new AbstractMap.SimpleEntry<>(key, value);
@@ -327,15 +328,14 @@ final class RealPocket implements Pocket {
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
-        Flowable<Option<T>> flowable = keyChanges()
-                .filter(key::equals)
-                .startWith("") // trigger initial load
-                .flatMapSingle(__ -> {
-                    try {
-                        Option<T> option = this.<T>getOptional(key,  type).blockingGet();
-                        return Single.just(option);
-                    } catch (Exception ignored) {
-                        return Single.just(Option.<T>absent());
+        Flowable<Option<T>> flowable = this.<T>stream(type)
+                .filter(entry -> entry.getKey().equals(key))
+                .startWith(new AbstractMap.SimpleEntry<>(key, null))
+                .map(entry -> {
+                    if (entry.getValue() != null) {
+                        return Option.present(entry.getValue());
+                    } else {
+                        return Option.absent();
                     }
                 });
         if (scheduler != null) {

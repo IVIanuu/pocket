@@ -1,5 +1,6 @@
 package com.ivianuu.pocket.sharedpreferencesstorage;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -14,6 +15,7 @@ import java.util.List;
 /**
  * Shared preferences storage implementation
  */
+@SuppressLint("ApplySharedPref")
 public final class SharedPreferencesStorage implements Storage {
 
     private final SharedPreferences sharedPreferences;
@@ -50,7 +52,7 @@ public final class SharedPreferencesStorage implements Storage {
 
     @Override
     public void put(@NonNull String key, @NonNull String value) {
-        sharedPreferences.edit().putString(key, value).apply();
+        sharedPreferences.edit().putString(key, value).commit();
     }
 
     @Nullable
@@ -62,12 +64,12 @@ public final class SharedPreferencesStorage implements Storage {
 
     @Override
     public void delete(@NonNull String key) {
-        sharedPreferences.edit().remove(key).apply();
+        sharedPreferences.edit().remove(key).commit();
     }
 
     @Override
     public void deleteAll() {
-        sharedPreferences.edit().clear().apply();
+        sharedPreferences.edit().clear().commit();
     }
 
     @Override

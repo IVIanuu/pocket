@@ -71,7 +71,7 @@ public final class LruCache implements Cache {
     }
 
     @Override
-    public <T> void put(@NonNull String key, @NonNull T value) {
+    public void put(@NonNull String key, @NonNull Object value) {
         lruCache.put(key, value);
     }
 

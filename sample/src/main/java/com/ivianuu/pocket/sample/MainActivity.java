@@ -11,9 +11,9 @@ import android.widget.Toast;
 
 import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.base64encryption.Base64Encryption;
-import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 import com.ivianuu.pocket.lrucache.LruCache;
+import com.ivianuu.pocket.moshiserializer.MoshiSerializer;
 import com.ivianuu.pocket.sharedpreferencesstorage.SharedPreferencesStorage;
 
 import java.util.List;
@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         pocket = PocketBuilder.builder()
                 .cache(LruCache.create(Integer.MAX_VALUE))
                 .encryption(Base64Encryption.create())
-                .serializer(GsonSerializer.create())
+                .serializer(MoshiSerializer.create())
                 .storage(SharedPreferencesStorage.create(this))
                 .build();
 

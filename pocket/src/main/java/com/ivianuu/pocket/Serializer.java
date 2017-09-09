@@ -29,7 +29,7 @@ public interface Serializer {
      * Serializes the value
      */
     @NonNull
-    <T> String serialize(@NonNull T value) throws Exception;
+    String serialize(@NonNull Object value) throws Exception;
 
     /**
      * Deserializes the string to the value

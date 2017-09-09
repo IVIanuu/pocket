@@ -27,7 +27,7 @@ public interface Cache {
     /**
      * Puts the value into the cache
      */
-    <T> void put(@NonNull String key, @NonNull T value);
+    void put(@NonNull String key, @NonNull Object value);
 
     /**
      * Returns the value from the cache or null if not exists

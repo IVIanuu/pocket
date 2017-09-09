@@ -53,8 +53,8 @@ public final class MoshiSerializer implements Serializer {
 
     @NonNull
     @Override
-    public <T> String serialize(@NonNull T value) {
-        JsonAdapter<T> adapter = moshi.<T>adapter(value.getClass());
+    public String serialize(@NonNull Object value) {
+        JsonAdapter<Object> adapter = moshi.<Object>adapter(value.getClass());
         return adapter.toJson(value);
     }
 

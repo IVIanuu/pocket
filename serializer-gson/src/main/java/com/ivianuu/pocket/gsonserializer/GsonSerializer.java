@@ -53,7 +53,7 @@ public final class GsonSerializer implements Serializer {
 
     @NonNull
     @Override
-    public <T> String serialize(@NonNull T value) {
+    public String serialize(@NonNull Object value) {
         return gson.toJson(value);
     }
 

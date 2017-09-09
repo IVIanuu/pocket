@@ -37,7 +37,7 @@ final class NoOpCache implements Cache {
     }
 
     @Override
-    public <T> void put(@NonNull String key, @NonNull T value) {
+    public void put(@NonNull String key, @NonNull Object value) {
         // ignore
     }
 

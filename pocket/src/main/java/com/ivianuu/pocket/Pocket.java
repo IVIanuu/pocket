@@ -19,6 +19,7 @@ package com.ivianuu.pocket;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 import io.reactivex.Completable;
@@ -45,10 +46,23 @@ public interface Pocket {
 
     /**
      * Reads the value for the key
+     */
+    @CheckResult @NonNull
+    <T> Maybe<T> get(@NonNull String key, @NonNull Type type);
+
+    /**
+     * Reads the value for the key
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
     <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz);
+
+    /**
+     * Reads the value for the key
+     * if no value found it will return the default value
+     */
+    @CheckResult @NonNull
+    <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type);
 
     /**
      * Deletes the value for the key
@@ -86,4 +100,11 @@ public interface Pocket {
      */
     @CheckResult @NonNull
     <T> Flowable<T> stream(@NonNull final String key, @NonNull Class<T> clazz);
+
+    /**
+     * Emits on value changes
+     * Emits on subscribe
+     */
+    @CheckResult @NonNull
+    <T> Flowable<T> stream(@NonNull final String key, @NonNull Type type);
 }

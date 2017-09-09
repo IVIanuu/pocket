@@ -55,7 +55,7 @@ public final class JacksonSerializer implements Serializer {
 
     @NonNull
     @Override
-    public <T> String serialize(@NonNull T value) throws Exception {
+    public String serialize(@NonNull Object value) throws Exception {
         JavaType javaType = objectMapper.constructType(value.getClass());
         ObjectWriter writer = objectMapper.writerFor(javaType);
         return writer.writeValueAsString(value);

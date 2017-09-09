@@ -26,6 +26,7 @@ import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -105,6 +106,12 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
+        return get(key, (Type) clazz);
+    }
+
+    @NonNull
+    @Override
+    public <T> Maybe<T> get(@NonNull final String key, @NonNull final Type type) {
         Maybe<T> maybe;
 
         // first try to get the cached value
@@ -125,7 +132,7 @@ final class RealPocket implements Pocket {
                         String serialized = encryption.decrypt(key, encrypted);
 
                         // deserialize to the value
-                        T value = serializer.deserialize(serialized, clazz);
+                        T value = serializer.deserialize(serialized, type);
 
                         // notify
                         if (!e.isDisposed()) {
@@ -138,12 +145,12 @@ final class RealPocket implements Pocket {
                     }
                 }
             }).doOnSuccess(new Consumer<T>() {
-                        @Override
-                        public void accept(T value) throws Exception {
-                            // put into the cache afterwards
-                            cache.put(key, value);
-                        }
-                    });
+                @Override
+                public void accept(T value) throws Exception {
+                    // put into the cache afterwards
+                    cache.put(key, value);
+                }
+            });
         }
         if (scheduler != null) {
             maybe = maybe.subscribeOn(scheduler);
@@ -155,7 +162,13 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
-        Single<T> single = get(key, clazz)
+        return get(key, defaultValue, (Type) clazz);
+    }
+
+    @NonNull
+    @Override
+    public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type) {
+        Single<T> single = (Single<T>) get(key, type)
                 .defaultIfEmpty(defaultValue) // switch to default
                 .toSingle();
         if (scheduler != null) {
@@ -262,6 +275,12 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
+        return stream(key, (Type) clazz);
+    }
+
+    @NonNull
+    @Override
+    public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
         Flowable<T> flowable = keyChanges()
@@ -275,7 +294,7 @@ final class RealPocket implements Pocket {
                 .flatMapMaybe(new Function<String, MaybeSource<? extends T>>() {
                     @Override
                     public MaybeSource<? extends T> apply(String s) throws Exception {
-                        return get(key, clazz);
+                        return get(key, type);
                     }
                 });
         if (scheduler != null) {

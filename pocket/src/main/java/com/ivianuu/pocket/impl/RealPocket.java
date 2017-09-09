@@ -151,7 +151,7 @@ final class RealPocket implements Pocket {
     @CheckResult @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type) {
-        Single<T> single = (Single<T>) get(key, type)
+        Single<T> single = this.<T>get(key, type)
                 .defaultIfEmpty(defaultValue) // switch to default
                 .toSingle();
         if (scheduler != null) {
@@ -170,8 +170,8 @@ final class RealPocket implements Pocket {
     @CheckResult @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type) {
-        return get(key, type)
-                .map(value -> Option.present((T) value))
+        return this.<T>get(key, type)
+                .map(Option::present)
                 .switchIfEmpty(Maybe.just(Option.absent()))
                 .toSingle();
     }
@@ -255,7 +255,7 @@ final class RealPocket implements Pocket {
                     Map<String, T> map = new LinkedHashMap<>();
                     for (String key : keys) {
                         try {
-                            map.put(key, (T) get(key, type).blockingGet());
+                            map.put(key, this.<T>get(key, type).blockingGet());
                         } catch (Exception ignored) {
                         }
                     }
@@ -302,7 +302,7 @@ final class RealPocket implements Pocket {
         Flowable<Map.Entry<String, T>> flowable = keyChanges()
                 .flatMapMaybe(key -> {
                     try {
-                        T value = (T) get(key, type).blockingGet();
+                        T value = this.<T>get(key, type).blockingGet();
                         Map.Entry<String, T> entry = new AbstractMap.SimpleEntry<>(key, value);
                         return Maybe.just(entry);
                     } catch (Exception ignored) {
@@ -318,24 +318,24 @@ final class RealPocket implements Pocket {
 
     @CheckResult @NonNull
     @Override
-    public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
+    public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
         return stream(key, (Type) clazz);
     }
 
     @CheckResult @NonNull
     @Override
-    public <T> Flowable<T> stream(@NonNull final String key, @NonNull final Type type) {
+    public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
-        Flowable<T> flowable = keyChanges()
+        Flowable<Option<T>> flowable = keyChanges()
                 .filter(key::equals)
                 .startWith("") // trigger initial load
-                .flatMapMaybe(__ -> {
+                .flatMapSingle(__ -> {
                     try {
-                        T value = (T) get(key, type).blockingGet();
-                        return Maybe.just(value);
+                        Option<T> option = this.<T>getOptional(key,  type).blockingGet();
+                        return Single.just(option);
                     } catch (Exception ignored) {
-                        return Maybe.empty();
+                        return Single.just(Option.<T>absent());
                     }
                 });
         if (scheduler != null) {

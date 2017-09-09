@@ -145,11 +145,11 @@ public interface Pocket {
      * Emits on value changes and on first subscribe
      */
     @CheckResult @NonNull
-    <T> Flowable<T> stream(@NonNull final String key, @NonNull Class<T> clazz);
+    <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull Class<T> clazz);
 
     /**
      * Emits on value changes and on first subscribe
      */
     @CheckResult @NonNull
-    <T> Flowable<T> stream(@NonNull final String key, @NonNull Type type);
+    <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull Type type);
 }

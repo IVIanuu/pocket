@@ -20,8 +20,8 @@ import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -90,10 +90,10 @@ public interface Pocket {
     Single<List<String>> getAllKeys();
 
     /**
-     * Returns all key
+     * Returns a map of all key and value pairs
      */
     @CheckResult @NonNull
-    Single<HashMap<String, ?>> getAll();
+    Single<Map<String, ?>> getAll();
 
     /**
      * Emits on key changes

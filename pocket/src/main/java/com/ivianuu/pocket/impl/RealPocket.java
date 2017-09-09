@@ -29,6 +29,7 @@ import com.ivianuu.pocket.Storage;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import io.reactivex.Completable;
@@ -120,7 +121,7 @@ final class RealPocket implements Pocket {
         if (cachedValue != null) {
             maybe = Maybe.just(cachedValue);
         } else {
-            // if the cache does not contains the key try to fetch from disk
+            // if the cache does not contain the key try to fetch from disk
             maybe = Maybe.create(new MaybeOnSubscribe<T>() {
                 @Override
                 public void subscribe(MaybeEmitter<T> e) throws Exception {
@@ -148,7 +149,7 @@ final class RealPocket implements Pocket {
             }).doOnSuccess(new Consumer<T>() {
                 @Override
                 public void accept(T value) throws Exception {
-                    // put into the cache afterwards
+                    // put into the cache
                     cache.put(key, value);
                 }
             });
@@ -265,12 +266,12 @@ final class RealPocket implements Pocket {
 
     @NonNull
     @Override
-    public Single<HashMap<String, ?>> getAll() {
-        Single<HashMap<String, ?>> single = getAllKeys()
-                .map(new Function<List<String>, HashMap<String, ?>>() {
+    public Single<Map<String, ?>> getAll() {
+        Single<Map<String, ?>> single = getAllKeys()
+                .map(new Function<List<String>, Map<String, ?>>() {
                     @Override
-                    public HashMap<String, Object> apply(List<String> keys) throws Exception {
-                        HashMap<String, Object> map = new HashMap<>();
+                    public Map<String, Object> apply(List<String> keys) throws Exception {
+                        Map<String, Object> map = new HashMap<>();
                         for (String key : keys) {
                             Object value = get(key, Object.class).blockingGet();
                             map.put(key, value);

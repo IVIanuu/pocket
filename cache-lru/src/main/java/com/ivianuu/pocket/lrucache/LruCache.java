@@ -32,34 +32,13 @@ public final class LruCache implements Cache {
         this.lruCache = lruCache;
     }
 
-    private LruCache(int maxSize, final SizePredicate sizePredicate) {
-        this.lruCache = new android.support.v4.util.LruCache<String, Object>(maxSize) {
-            @Override
-            protected int sizeOf(String key, Object value) {
-                if (sizePredicate != null) {
-                    return sizePredicate.sizeOf(key, value);
-                } else {
-                    return super.sizeOf(key, value);
-                }
-            }
-        };
-    }
-
     /**
      * Returns a new pocket lru cache
      * This will use 1 as the size for every item
      */
     @NonNull
     public static Cache create(int maxSize) {
-        return create(maxSize, null);
-    }
-
-    /**
-     * Returns a new pocket lru cache
-     */
-    @NonNull
-    public static Cache create(int maxSize, @Nullable SizePredicate sizePredicate) {
-        return new LruCache(maxSize, sizePredicate);
+        return create(new android.support.v4.util.LruCache<String, Object>(maxSize));
     }
 
     /**
@@ -89,12 +68,5 @@ public final class LruCache implements Cache {
     @Override
     public void removeAll() {
         lruCache.evictAll();
-    }
-
-    public interface SizePredicate {
-        /**
-         * Returns the size of this value
-         */
-        int sizeOf(@NonNull String key, @NonNull Object value);
     }
 }

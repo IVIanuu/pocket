@@ -264,17 +264,23 @@ final class RealPocket implements Pocket {
         return single;
     }
 
-    @CheckResult @NonNull
     @Override
-    public Single<Map<String, ?>> getAll() {
-        Single<Map<String, ?>> single = getAllKeys()
-                .map(new Function<List<String>, Map<String, ?>>() {
+    public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
+        return getAll((Type) clazz);
+    }
+
+    @Override
+    public <T> Single<Map<String, T>> getAll(final Type type) {
+        Single<Map<String, T>> single = getAllKeys()
+                .map(new Function<List<String>, Map<String, T>>() {
                     @Override
-                    public Map<String, Object> apply(List<String> keys) throws Exception {
-                        Map<String, Object> map = new LinkedHashMap<>();
+                    public Map<String, T> apply(List<String> keys) throws Exception {
+                        Map<String, T> map = new LinkedHashMap<>();
                         for (String key : keys) {
-                            Object value = get(key, Object.class).blockingGet();
-                            map.put(key, value);
+                            try {
+                                map.put(key, (T) get(key, type).blockingGet());
+                            } catch (Exception ignored) {
+                            }
                         }
 
                         return map;
@@ -285,29 +291,6 @@ final class RealPocket implements Pocket {
         }
 
         return single;
-    }
-
-    @Override
-    public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
-        return getAll((Type) clazz);
-    }
-
-    @Override
-    public <T> Single<Map<String, T>> getAll(final Type type) {
-        return getAllKeys()
-                .map(new Function<List<String>, Map<String, T>>() {
-                    @Override
-                    public Map<String, T> apply(List<String> keys) throws Exception {
-                        Map<String, T> map = new LinkedHashMap<>();
-                        for (String key : keys) {
-                            try {
-                                map.put(key, (T) get(key, type).blockingGet());
-                            } catch (Exception ignored) {}
-                        }
-
-                        return map;
-                    }
-                });
     }
 
     @CheckResult @NonNull

@@ -90,12 +90,6 @@ public interface Pocket {
     Single<List<String>> getAllKeys();
 
     /**
-     * Returns a map of all key and value pairs
-     */
-    @CheckResult @NonNull
-    Single<Map<String, ?>> getAll();
-
-    /**
      * Returns a map of all all keys with the provided value type
      */
     <T> Single<Map<String, T>> getAll(Class<T> clazz);

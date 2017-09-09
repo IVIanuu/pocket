@@ -37,7 +37,7 @@ public final class LruCache implements Cache {
      */
     @NonNull
     public static Cache create(int maxSize) {
-        return create(new android.support.v4.util.LruCache<String, Object>(maxSize));
+        return create(new android.support.v4.util.LruCache<>(maxSize));
     }
 
     /**

@@ -19,6 +19,8 @@ package com.ivianuu.pocket;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 
+import com.ivianuu.pocket.impl.Option;
+
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,20 @@ public interface Pocket {
      */
     @CheckResult @NonNull
     <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type);
+
+    /**
+     * Reads the value for the key
+     * if no value found it will return the default value
+     */
+    @CheckResult @NonNull
+    <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Class<T> clazz);
+
+    /**
+     * Reads the value for the key
+     * if no value found it will return the default value
+     */
+    @CheckResult @NonNull
+    <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type);
 
     /**
      * Deletes the value for the key

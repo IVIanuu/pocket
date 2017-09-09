@@ -70,7 +70,7 @@ final class RealPocket implements Pocket {
 
     @NonNull
     @Override
-    public <T> Completable put(@NonNull final String key, @NonNull final T value) {
+    public Completable put(@NonNull final String key, @NonNull final Object value) {
         Completable completable = Completable
                 .fromCallable(new Callable<Object>() {
                     @Override
@@ -137,8 +137,7 @@ final class RealPocket implements Pocket {
                         e.onComplete();
                     }
                 }
-            })
-                    .doOnSuccess(new Consumer<T>() {
+            }).doOnSuccess(new Consumer<T>() {
                         @Override
                         public void accept(T value) throws Exception {
                             // put into the cache afterwards

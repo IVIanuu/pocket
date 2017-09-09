@@ -31,6 +31,9 @@ dependencies {
     // Filesystem storage
     implementation project(':storage-filesystem')
 
+    // Moshi Serializer
+    implementation project(':serializer-moshi')
+
     // Shared Preferences storage
     implementation project(':storage-sharedpreferences')
 

@@ -81,7 +81,7 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public synchronized void put(@NonNull String key, @NonNull String value) {
+    public void put(@NonNull String key, @NonNull String value) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -106,7 +106,7 @@ public final class FileSystemStorage implements Storage {
 
     @Nullable
     @Override
-    public synchronized String get(@NonNull String key) {
+    public String get(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -126,7 +126,7 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public synchronized void delete(@NonNull String key) {
+    public void delete(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -142,14 +142,14 @@ public final class FileSystemStorage implements Storage {
     }
 
     @Override
-    public synchronized void deleteAll() {
+    public void deleteAll() {
         assertInit();
         deleteDirectory(filesDir);
         pocketDirCreated = false;
     }
 
     @Override
-    public synchronized boolean contains(@NonNull String key) {
+    public boolean contains(@NonNull String key) {
         assertInit();
 
         final File originalFile = getOriginalFile(key);
@@ -158,7 +158,7 @@ public final class FileSystemStorage implements Storage {
 
     @NonNull
     @Override
-    public synchronized List<String> getAllKeys() {
+    public List<String> getAllKeys() {
         assertInit();
 
         String[] names = filesDir.list();

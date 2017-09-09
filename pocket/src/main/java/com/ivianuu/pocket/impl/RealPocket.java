@@ -27,6 +27,7 @@ import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -259,6 +260,29 @@ final class RealPocket implements Pocket {
         if (scheduler != null) {
             single = single.subscribeOn(scheduler);
         }
+        return single;
+    }
+
+    @NonNull
+    @Override
+    public Single<HashMap<String, ?>> getAll() {
+        Single<HashMap<String, ?>> single = getAllKeys()
+                .map(new Function<List<String>, HashMap<String, ?>>() {
+                    @Override
+                    public HashMap<String, Object> apply(List<String> keys) throws Exception {
+                        HashMap<String, Object> map = new HashMap<>();
+                        for (String key : keys) {
+                            Object value = get(key, Object.class).blockingGet();
+                            map.put(key, value);
+                        }
+
+                        return map;
+                    }
+                });
+        if (scheduler != null) {
+            single = single.subscribeOn(scheduler);
+        }
+
         return single;
     }
 

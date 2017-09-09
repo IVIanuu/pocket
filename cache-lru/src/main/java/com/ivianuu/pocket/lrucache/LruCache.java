@@ -44,7 +44,7 @@ public final class LruCache implements Cache {
      * Returns a new pocket lru cache
      */
     @NonNull
-    public static Cache create(android.support.v4.util.LruCache<String, Object> lruCache) {
+    public static Cache create(@NonNull android.support.v4.util.LruCache<String, Object> lruCache) {
         return new LruCache(lruCache);
     }
 

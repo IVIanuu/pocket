@@ -170,7 +170,7 @@ final class RealPocket implements Pocket {
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type) {
         return this.<T>get(key, type)
-                .map(Option::present)
+                .map(Option::of)
                 .switchIfEmpty(Maybe.just(Option.absent()))
                 .toSingle();
     }
@@ -332,7 +332,7 @@ final class RealPocket implements Pocket {
                 .startWith(new AbstractMap.SimpleEntry<>(key, null))
                 .map(entry -> {
                     if (entry.getValue() != null) {
-                        return Option.present(entry.getValue());
+                        return Option.of(entry.getValue());
                     } else {
                         return Option.absent();
                     }

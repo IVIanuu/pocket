@@ -14,6 +14,9 @@ import com.ivianuu.pocket.filesystemstorage.FileSystemStorage;
 import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
@@ -89,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             loadData.dispose();
         }
 
-        /**
         loadData = pocket.getAll(Person.class)
                 .map(map -> {
                     List<Person> people = new ArrayList<>();
@@ -98,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .observeOn(mainThread())
                 .subscribe();
-
-         */
          }
 
     @Override

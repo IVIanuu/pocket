@@ -40,7 +40,7 @@ import io.reactivex.Single;
 import io.reactivex.processors.PublishProcessor;
 
 /**
- * RealPocket dao
+ * Pocket implementation
  */
 final class RealPocket implements Pocket {
 
@@ -67,18 +67,17 @@ final class RealPocket implements Pocket {
     @NonNull
     @Override
     public Completable put(@NonNull final String key, @NonNull final Object value) {
-        Completable completable = Completable
-                .fromCallable(() -> {
-                    // serialize
-                    String serialized = serializer.serialize(value);
+        Completable completable = Completable.fromCallable(() -> {
+            // serialize
+            String serialized = serializer.serialize(value);
 
-                    // encrypt
-                    String encrypted = encryption.encrypt(key, serialized);
+            // encrypt
+            String encrypted = encryption.encrypt(key, serialized);
 
-                    // persist
-                    storage.put(key, encrypted);
-                    return new Object();
-                })
+            // persist
+            storage.put(key, encrypted);
+            return new Object();
+        })
                 .doOnComplete(() -> {
                     // put into the cache
                     cache.put(key, value);
@@ -253,11 +252,11 @@ final class RealPocket implements Pocket {
         Single<Map<String, T>> single = getAllKeys()
                 .map(keys -> {
                     Map<String, T> map = new LinkedHashMap<>();
+                    // TODO: 09.09.2017  dirtyyyy
                     for (String key : keys) {
                         try {
                             map.put(key, this.<T>get(key, type).blockingGet());
-                        } catch (Exception ignored) {
-                        }
+                        } catch (Exception ignored) {}
                     }
 
                     return map;

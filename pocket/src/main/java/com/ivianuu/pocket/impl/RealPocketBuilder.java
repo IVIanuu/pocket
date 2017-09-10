@@ -27,7 +27,7 @@ import com.ivianuu.pocket.Storage;
 import io.reactivex.Scheduler;
 
 /**
- * Generic pocket builder
+ * Pocket builder
  */
 public final class RealPocketBuilder {
 

@@ -42,7 +42,7 @@ import io.reactivex.processors.PublishProcessor;
 /**
  * Pocket implementation
  */
-public final class RealPocket implements Pocket {
+public class RealPocket implements Pocket {
 
     private final Cache cache;
     private final Encryption encryption;

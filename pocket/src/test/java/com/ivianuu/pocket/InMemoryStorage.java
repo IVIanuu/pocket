@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * In memory storage
  */
-public class InMemoryStorage implements Storage {
+class InMemoryStorage implements Storage {
 
     private final HashMap<String, String> storage = new HashMap<>();
 

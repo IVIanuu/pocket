@@ -23,6 +23,8 @@ import com.ivianuu.pocket.impl.PocketBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 
+import java.util.Map;
+
 import io.reactivex.subscribers.TestSubscriber;
 
 /**
@@ -31,7 +33,7 @@ import io.reactivex.subscribers.TestSubscriber;
 public class PocketTest {
 
     private static final String TEST_KEY = "key";
-    private static final String TEST_VALUE = "value";
+    private static final Person TEST_PERSON = new Person("Joe", "Jackson", 25);
 
     @Test
     public void testPut() {
@@ -40,7 +42,7 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
         Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(1);
     }
@@ -52,11 +54,11 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        Assertions.assertThat(pocket.get(TEST_KEY, String.class).blockingGet()).isNull();
+        Assertions.assertThat(pocket.get(TEST_KEY, Person.class).blockingGet()).isNull();
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
-        Assertions.assertThat(pocket.get(TEST_KEY, String.class).blockingGet()).isEqualTo(TEST_VALUE);
+        Assertions.assertThat(pocket.get(TEST_KEY, Person.class).blockingGet()).isEqualTo(TEST_PERSON);
     }
 
     @Test
@@ -66,12 +68,14 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        String value = pocket.get(TEST_KEY, "default_value", String.class).blockingGet();
-        Assertions.assertThat(value).isEqualTo("default_value");
+        Person defaultPerson = new Person("Chris", "Pennas", 68);
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
-        value = pocket.get(TEST_KEY, "default_value", String.class).blockingGet();
-        Assertions.assertThat(value).isEqualTo(TEST_VALUE);
+        Person person = pocket.get(TEST_KEY, defaultPerson, Person.class).blockingGet();
+        Assertions.assertThat(person).isEqualTo(defaultPerson);
+
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
+        person = pocket.get(TEST_KEY, defaultPerson, Person.class).blockingGet();
+        Assertions.assertThat(person).isEqualTo(TEST_PERSON);
     }
 
     @Test
@@ -81,11 +85,11 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        Option<String> option = pocket.getOptional(TEST_KEY, String.class).blockingGet();
+        Option<Person> option = pocket.getOptional(TEST_KEY, Person.class).blockingGet();
         Assertions.assertThat(option.present()).isEqualTo(false);
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
-        option = pocket.getOptional(TEST_KEY, String.class).blockingGet();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
+        option = pocket.getOptional(TEST_KEY, Person.class).blockingGet();
         Assertions.assertThat(option.present()).isEqualTo(true);
     }
 
@@ -96,7 +100,7 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
         pocket.delete(TEST_KEY).blockingAwait();
 
         Assertions.assertThat(pocket.contains(TEST_KEY).blockingGet()).isEqualTo(false);
@@ -109,11 +113,9 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        pocket.put("1", TEST_VALUE).blockingAwait();
-        pocket.put("2", TEST_VALUE).blockingAwait();
-        pocket.put("3", TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
-        Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(3);
+        Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(1);
 
         pocket.deleteAll().blockingAwait();
 
@@ -127,9 +129,9 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        Assertions.assertThat(pocket.contains(TEST_VALUE).blockingGet()).isEqualTo(false);
+        Assertions.assertThat(pocket.contains(TEST_KEY).blockingGet()).isEqualTo(false);
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
         Assertions.assertThat(pocket.contains(TEST_KEY).blockingGet()).isEqualTo(true);
     }
@@ -141,9 +143,9 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        pocket.put("A", TEST_VALUE).blockingAwait();
-        pocket.put("B", TEST_VALUE).blockingAwait();
-        pocket.put("C", TEST_VALUE).blockingAwait();
+        pocket.put("A", TEST_PERSON).blockingAwait();
+        pocket.put("B", TEST_PERSON).blockingAwait();
+        pocket.put("C", TEST_PERSON).blockingAwait();
 
         Assertions.assertThat(pocket.getAllKeys().blockingGet()).containsExactly("A", "B", "C");
     }
@@ -170,9 +172,9 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
-        pocket.put("A", TEST_VALUE).blockingAwait();
+        pocket.put("A", TEST_PERSON).blockingAwait();
         Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(1);
-        pocket.put("B", TEST_VALUE).blockingAwait();
+        pocket.put("B", TEST_PERSON).blockingAwait();
         Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(2);
         pocket.delete("B").blockingAwait();
         Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(1);
@@ -188,7 +190,7 @@ public class PocketTest {
         TestSubscriber<String> subscriber = new TestSubscriber<>();
         pocket.keyChanges().subscribe(subscriber);
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
         subscriber.assertValue(TEST_KEY);
 
@@ -199,24 +201,24 @@ public class PocketTest {
 
     @Test
     public void testStream() {
-        /*
         Pocket pocket = PocketBuilder.builder()
                 .serializer(GsonSerializer.create())
                 .storage(new InMemoryStorage())
                 .build();
 
-        TestSubscriber<Map.Entry<String, Boolean>> subscriber = new TestSubscriber<>();
+        TestSubscriber<Map.Entry<String, Person>> subscriber = new TestSubscriber<>();
 
-        pocket.stream(Boolean.class).subscribe(subscriber);
+        pocket.stream(Person.class).subscribe(subscriber);
 
-        pocket.put(TEST_KEY, TEST_VALUE).blockingAwait();
+        pocket.put(TEST_KEY, 1111).blockingAwait();
 
         subscriber.assertNoValues();
 
-        pocket.put(TEST_KEY, true).blockingAwait();
-        pocket.put(TEST_KEY, false).blockingAwait();
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
+        pocket.delete(TEST_KEY).blockingAwait();
 
         Assertions.assertThat(subscriber.valueCount()).isEqualTo(2);
-    */
     }
+
+
 }

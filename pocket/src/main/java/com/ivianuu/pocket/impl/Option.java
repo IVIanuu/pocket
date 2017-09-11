@@ -34,7 +34,7 @@ public final class Option<T> {
      * Returns a new present option
      */
     @NonNull
-    static <T> Option<T> of(@NonNull T value) {
+    public static <T> Option<T> of(@NonNull T value) {
         return new Option<>(value);
     }
 
@@ -42,7 +42,7 @@ public final class Option<T> {
      * Returns a new present option
      */
     @NonNull
-    static <T> Option<T> absent() {
+    public static <T> Option<T> absent() {
         return new Option<>(null);
     }
 

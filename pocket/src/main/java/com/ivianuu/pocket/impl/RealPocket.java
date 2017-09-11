@@ -42,7 +42,7 @@ import io.reactivex.processors.PublishProcessor;
 /**
  * Pocket implementation
  */
-final class RealPocket implements Pocket {
+public final class RealPocket implements Pocket {
 
     private final Cache cache;
     private final Encryption encryption;
@@ -52,11 +52,17 @@ final class RealPocket implements Pocket {
 
     private final PublishProcessor<String> keyChangesProcessor = PublishProcessor.create();
 
-    RealPocket(@NonNull Cache cache,
-               @NonNull Encryption encryption,
-               @NonNull Storage storage,
-               @NonNull Serializer serializer,
-               @Nullable Scheduler scheduler) {
+    public RealPocket(@Nullable Cache cache,
+                      @Nullable Encryption encryption,
+                      @NonNull Storage storage,
+                      @NonNull Serializer serializer,
+                      @Nullable Scheduler scheduler) {
+        if (cache == null) {
+            cache = NoOpCache.create();
+        }
+        if (encryption == null) {
+            encryption = NoOpEncryption.create();
+        }
         this.cache = cache;
         this.encryption = encryption;
         this.storage = storage;

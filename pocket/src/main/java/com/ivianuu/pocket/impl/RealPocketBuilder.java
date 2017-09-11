@@ -97,14 +97,6 @@ public final class RealPocketBuilder {
             throw new IllegalStateException("serializer must be set");
         }
 
-        // check optionals
-        if (cache == null) {
-            cache = NoOpCache.create();
-        }
-        if (encryption == null) {
-            encryption = NoOpEncryption.create();
-        }
-
         return new RealPocket(cache, encryption, storage, serializer, scheduler);
     }
 }

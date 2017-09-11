@@ -83,13 +83,12 @@ public class RealPocket implements Pocket {
             // persist
             storage.put(key, encrypted);
             return new Object();
-        })
-                .doOnComplete(() -> {
-                    // put into the cache
-                    cache.put(key, value);
-                    // notify update
-                    keyChangesProcessor.onNext(key);
-                });
+        }).doOnComplete(() -> {
+            // put into the cache
+            cache.put(key, value);
+            // notify update
+            keyChangesProcessor.onNext(key);
+        });
         if (scheduler != null) {
             completable = completable.subscribeOn(scheduler);
         }
@@ -288,7 +287,7 @@ public class RealPocket implements Pocket {
     @CheckResult @NonNull
     @Override
     public Flowable<String> keyChanges() {
-        Flowable<String> flowable = keyChangesProcessor.share();
+        Flowable<String> flowable = keyChangesProcessor.hide().share();
         if (scheduler != null) {
             flowable = flowable.subscribeOn(scheduler);
         }

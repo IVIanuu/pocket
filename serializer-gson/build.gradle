@@ -4,14 +4,12 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.ivianuu'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 15
-        targetSdkVersion 26
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
     }
 
     compileOptions {
@@ -22,7 +20,7 @@ android {
 
 dependencies {
     // Gson
-    api 'com.google.code.gson:gson:2.8.1'
+    api rootProject.ext.gson
 
     // Pocket
     implementation project(':pocket')

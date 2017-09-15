@@ -15,7 +15,7 @@ import com.ivianuu.pocket.gsonserializer.GsonSerializer;
 import com.ivianuu.pocket.impl.PocketBuilder;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -93,11 +93,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         loadData = pocket.getAll(Person.class)
-                .map(map -> {
-                    List<Person> people = new ArrayList<>();
-                    people.addAll(map.values());
-                    return people;
-                })
+                .map(Map::values)
+                .map(ArrayList::new)
                 .observeOn(mainThread())
                 .subscribe();
          }

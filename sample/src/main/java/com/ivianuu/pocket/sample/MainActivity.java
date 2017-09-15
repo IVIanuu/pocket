@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 .map(Map::values)
                 .map(ArrayList::new)
                 .observeOn(mainThread())
-                .subscribe();
+                .subscribe(personAdapter::swapPersons);
          }
 
     @Override

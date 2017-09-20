@@ -35,8 +35,6 @@ public class PocketTest {
     private static final String TEST_KEY = "key";
     private static final Person TEST_PERSON = new Person("Joe", "Jackson", 25);
 
-
-
     @Test
     public void testPut() {
         Pocket pocket = PocketBuilder.builder()
@@ -195,7 +193,7 @@ public class PocketTest {
 
         pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
 
-        subscriber.assertValue(TEST_KEY);
+        Assertions.assertThat(subscriber.values().get(0)).isEqualTo(TEST_KEY);
 
         pocket.delete(TEST_KEY).blockingAwait();
 
@@ -203,7 +201,7 @@ public class PocketTest {
     }
 
     @Test
-    public void testStream() {
+    public void testStreamType() {
         Pocket pocket = PocketBuilder.builder()
                 .serializer(GsonSerializer.create())
                 .storage(new InMemoryStorage())
@@ -223,5 +221,32 @@ public class PocketTest {
         Assertions.assertThat(subscriber.valueCount()).isEqualTo(2);
     }
 
+    @Test
+    public void testStreamKey() {
+        Pocket pocket = PocketBuilder.builder()
+                .serializer(GsonSerializer.create())
+                .storage(new InMemoryStorage())
+                .build();
+
+        TestSubscriber<Option<Person>> subscriber = new TestSubscriber<>();
+
+        pocket.stream(TEST_KEY, Person.class).subscribe(subscriber);
+
+        Assertions.assertThat(subscriber.valueCount()).isEqualTo(1);
+
+        pocket.put("other_key", 1111).blockingAwait();
+
+        Assertions.assertThat(subscriber.valueCount()).isEqualTo(1);
+
+        pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
+
+        Assertions.assertThat(subscriber.valueCount()).isEqualTo(2);
+        subscriber.assertValueAt(1, Option::present);
+
+        pocket.delete(TEST_KEY).blockingAwait();
+
+        subscriber.assertValueAt(2, option -> !option.present());
+        subscriber.assertValueCount(3);
+    }
 
 }

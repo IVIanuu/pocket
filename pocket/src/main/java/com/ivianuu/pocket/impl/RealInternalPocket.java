@@ -337,14 +337,21 @@ final class RealInternalPocket implements InternalPocket {
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
-        Flowable<Option<T>> flowable = this.<T>stream(type)
-                .filter(entry -> entry.getKey().equals(key))
-                .startWith(new AbstractMap.SimpleEntry<>(key, null))
-                .map(entry -> {
-                    if (entry.getValue() != null) {
-                        return Option.of(entry.getValue());
-                    } else {
-                        return Option.absent();
+        Flowable<Option<T>> flowable = keyChanges()
+                .startWith(key)
+                .filter(key::equals)
+                .flatMapMaybe(changedKey -> {
+                    try {
+                        T value = this.<T>get(key, type).blockingGet();
+                        Option<T> option;
+                        if (value != null) {
+                            option = Option.of(value);
+                        } else {
+                            option = Option.absent();
+                        }
+                        return Maybe.just(option);
+                    } catch (Exception ignored) {
+                        return Maybe.empty();
                     }
                 });
         if (scheduler != null) {

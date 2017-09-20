@@ -42,7 +42,7 @@ public interface Pocket {
     Completable put(@NonNull String key, @NonNull Object value);
 
     /**
-     * Reads the value for the key
+     * Returns the value for the key
      */
     @CheckResult @NonNull
     <T> Maybe<T> get(@NonNull String key, @NonNull Class<T> clazz);
@@ -136,7 +136,7 @@ public interface Pocket {
     <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz);
 
     /**
-     * Emits on key changes
+     * Emits on key changes of the type
      */
     @CheckResult @NonNull
     <T> Flowable<Map.Entry<String, T>> stream(@NonNull Type type);

@@ -22,7 +22,6 @@ import android.support.annotation.Nullable;
 
 import com.ivianuu.pocket.Cache;
 import com.ivianuu.pocket.Encryption;
-import com.ivianuu.pocket.InternalPocket;
 import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;

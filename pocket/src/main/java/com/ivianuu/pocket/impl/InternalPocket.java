@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package com.ivianuu.pocket;
+package com.ivianuu.pocket.impl;
 
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
+
+import com.ivianuu.pocket.Pocket;
 
 import io.reactivex.Maybe;
 
 /**
  * Internal pocket
  */
-public interface InternalPocket extends Pocket {
-
+interface InternalPocket extends Pocket {
     /**
      * Maybe returns the cached value for the key
      */

@@ -35,6 +35,8 @@ public class PocketTest {
     private static final String TEST_KEY = "key";
     private static final Person TEST_PERSON = new Person("Joe", "Jackson", 25);
 
+
+
     @Test
     public void testPut() {
         Pocket pocket = PocketBuilder.builder()
@@ -172,6 +174,7 @@ public class PocketTest {
                 .storage(new InMemoryStorage())
                 .build();
 
+        Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(0);
         pocket.put("A", TEST_PERSON).blockingAwait();
         Assertions.assertThat(pocket.getCount().blockingGet()).isEqualTo(1);
         pocket.put("B", TEST_PERSON).blockingAwait();

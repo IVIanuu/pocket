@@ -102,7 +102,7 @@ final class RealInternalPocket implements InternalPocket {
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Type type) {
-        Maybe<T> maybe = this.<T>memory(key)
+        Maybe<T> maybe = this.<T>cached(key)
                 .switchIfEmpty(Maybe.<T>create(e -> {
                     // get encrypted data
                     String encrypted = storage.get(key);
@@ -357,7 +357,7 @@ final class RealInternalPocket implements InternalPocket {
 
     @NonNull
     @Override
-    public <T> Maybe<T> memory(@NonNull String key) {
+    public <T> Maybe<T> cached(@NonNull String key) {
         final T cachedValue = cache.get(key);
         if (cachedValue != null) {
             return Maybe.just(cachedValue);

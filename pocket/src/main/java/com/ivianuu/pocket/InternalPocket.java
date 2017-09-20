@@ -30,5 +30,5 @@ public interface InternalPocket extends Pocket {
      * Maybe returns the cached value for the key
      */
     @CheckResult @NonNull
-    <T> Maybe<T> memory(@NonNull String key);
+    <T> Maybe<T> cached(@NonNull String key);
 }

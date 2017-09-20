@@ -196,4 +196,12 @@ public class RealPocket implements Pocket {
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
         return internalPocket.stream(key, type);
     }
+
+    /**
+     * Returns the cached value for this key
+     */
+    @CheckResult @NonNull
+    protected <T> Maybe<T> cached(@NonNull String key) {
+        return internalPocket.cached(key);
+    }
 }

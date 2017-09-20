@@ -22,8 +22,6 @@ import com.ivianuu.pocket.Serializer;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
 
-import java.lang.reflect.Type;
-
 /**
  * Moshi serializer implementation
  */
@@ -60,8 +58,8 @@ public final class MoshiSerializer implements Serializer {
 
     @NonNull
     @Override
-    public <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception {
-        JsonAdapter<T> adapter = moshi.adapter(type);
+    public <T> T deserialize(@NonNull String serialized, @NonNull Class<T> clazz) throws Exception {
+        JsonAdapter<T> adapter = moshi.adapter(clazz);
         //noinspection ConstantConditions
         return adapter.fromJson(serialized);
     }

@@ -18,8 +18,6 @@ package com.ivianuu.pocket;
 
 import android.support.annotation.NonNull;
 
-import java.lang.reflect.Type;
-
 /**
  * Serializes and deserializes objects
  */
@@ -35,5 +33,5 @@ public interface Serializer {
      * Deserializes the string to the value
      */
     @NonNull
-    <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception;
+    <T> T deserialize(@NonNull String serialized, @NonNull Class<T> clazz) throws Exception;
 }

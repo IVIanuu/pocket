@@ -21,6 +21,7 @@ import android.support.annotation.NonNull;
 
 import com.ivianuu.pocket.impl.Option;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,12 @@ public interface Pocket {
 
     /**
      * Reads the value for the key
+     */
+    @CheckResult @NonNull
+    <T> Maybe<T> get(@NonNull String key, @NonNull Type type);
+
+    /**
+     * Reads the value for the key
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
@@ -58,7 +65,21 @@ public interface Pocket {
      * if no value found it will return the default value
      */
     @CheckResult @NonNull
+    <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type);
+
+    /**
+     * Reads the value for the key
+     * if no value found it will return the default value
+     */
+    @CheckResult @NonNull
     <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Class<T> clazz);
+
+    /**
+     * Reads the value for the key
+     * if no value found it will return the default value
+     */
+    @CheckResult @NonNull
+    <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type);
 
     /**
      * Deletes the value for the key
@@ -91,6 +112,12 @@ public interface Pocket {
     <T> Single<Map<String, T>> getAll(Class<T> clazz);
 
     /**
+     * Returns a map of all all keys with the provided value type
+     */
+    @CheckResult @NonNull
+    <T> Single<Map<String, T>> getAll(Type type);
+
+    /**
      * Returns the count of all entries
      */
     @CheckResult @NonNull
@@ -109,9 +136,20 @@ public interface Pocket {
     <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz);
 
     /**
+     * Emits on key changes
+     */
+    @CheckResult @NonNull
+    <T> Flowable<Map.Entry<String, T>> stream(@NonNull Type type);
+
+    /**
      * Emits on value changes and on first subscribe
      */
     @CheckResult @NonNull
     <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull Class<T> clazz);
 
+    /**
+     * Emits on value changes and on first subscribe
+     */
+    @CheckResult @NonNull
+    <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull Type type);
 }

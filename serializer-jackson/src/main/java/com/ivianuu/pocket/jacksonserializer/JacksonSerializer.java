@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.ivianuu.pocket.Serializer;
 
+import java.lang.reflect.Type;
+
 /**
  * Jackson serializer implementation
  */
@@ -61,8 +63,8 @@ public final class JacksonSerializer implements Serializer {
 
     @NonNull
     @Override
-    public <T> T deserialize(@NonNull String serialized, @NonNull Class<T> clazz) throws Exception {
-        JavaType javaType = objectMapper.constructType(clazz);
+    public <T> T deserialize(@NonNull String serialized, @NonNull Type type) throws Exception {
+        JavaType javaType = objectMapper.constructType(type);
         ObjectReader reader = objectMapper.readerFor(javaType);
         return reader.readValue(serialized);
     }

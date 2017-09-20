@@ -26,6 +26,7 @@ import com.ivianuu.pocket.Pocket;
 import com.ivianuu.pocket.Serializer;
 import com.ivianuu.pocket.Storage;
 
+import java.lang.reflect.Type;
 import java.util.AbstractMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -100,6 +101,13 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
+        return get(key, (Type) clazz);
+    }
+
+    @CheckResult
+    @NonNull
+    @Override
+    public <T> Maybe<T> get(@NonNull final String key, @NonNull final Type type) {
         Maybe<T> maybe;
 
         // first try to get the cached value
@@ -118,7 +126,7 @@ public class RealPocket implements Pocket {
                     String serialized = encryption.decrypt(key, encrypted);
 
                     // deserialize to the value
-                    T value = serializer.deserialize(serialized, clazz);
+                    T value = serializer.deserialize(serialized, type);
 
                     // notify
                     if (!e.isDisposed()) {
@@ -145,7 +153,14 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
-        Single<T> single = this.<T>get(key, clazz)
+        return get(key, defaultValue, (Type) clazz);
+    }
+
+    @CheckResult
+    @NonNull
+    @Override
+    public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type) {
+        Single<T> single = this.<T>get(key, type)
                 .defaultIfEmpty(defaultValue) // switch to default
                 .toSingle();
         if (scheduler != null) {
@@ -159,7 +174,14 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Class<T> clazz) {
-        return this.<T>get(key, clazz)
+        return getOptional(key, (Type) clazz);
+    }
+
+    @CheckResult
+    @NonNull
+    @Override
+    public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type) {
+        return this.<T>get(key, type)
                 .map(Option::of)
                 .switchIfEmpty(Maybe.just(Option.absent()))
                 .toSingle();
@@ -238,13 +260,19 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
+        return getAll((Type) clazz);
+    }
+
+    @CheckResult @NonNull
+    @Override
+    public <T> Single<Map<String, T>> getAll(final Type type) {
         Single<Map<String, T>> single = getAllKeys()
                 .map(keys -> {
                     Map<String, T> map = new LinkedHashMap<>();
                     // TODO: 09.09.2017  dirtyyyy
                     for (String key : keys) {
                         try {
-                            map.put(key, this.<T>get(key, clazz).blockingGet());
+                            map.put(key, this.<T>get(key, type).blockingGet());
                         } catch (Exception ignored) {}
                     }
 
@@ -284,11 +312,18 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz) {
+        return stream((Type) clazz);
+    }
+
+    @CheckResult
+    @NonNull
+    @Override
+    public <T> Flowable<Map.Entry<String, T>> stream(@NonNull final Type type) {
         Flowable<Map.Entry<String, T>> flowable = keyChanges()
                 .flatMapMaybe(key -> {
                     // TODO: 09.09.2017 is there a better way ?
                     try {
-                        T value = this.<T>get(key, clazz).blockingGet();
+                        T value = this.<T>get(key, type).blockingGet();
                         Map.Entry<String, T> entry = new AbstractMap.SimpleEntry<>(key, value);
                         return Maybe.just(entry);
                     } catch (Exception ignored) {
@@ -306,9 +341,16 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
+        return stream(key, (Type) clazz);
+    }
+
+    @CheckResult
+    @NonNull
+    @Override
+    public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
         // we need to filter the key changes were interested in
         // every time the key changes we emit the next value
-        Flowable<Option<T>> flowable = this.<T>stream(clazz)
+        Flowable<Option<T>> flowable = this.<T>stream(type)
                 .filter(entry -> entry.getKey().equals(key))
                 .startWith(new AbstractMap.SimpleEntry<>(key, null))
                 .map(entry -> {

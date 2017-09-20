@@ -44,6 +44,11 @@ public class RealPocket implements Pocket {
 
     private final InternalPocket internalPocket;
 
+    public RealPocket(@NonNull Storage storage,
+                      @NonNull Serializer serializer) {
+        this(null, null, storage, serializer, null);
+    }
+
     public RealPocket(@Nullable Cache cache,
                       @Nullable Encryption encryption,
                       @NonNull Storage storage,

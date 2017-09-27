@@ -216,6 +216,8 @@ public class PocketTest {
         subscriber.assertNoValues();
 
         pocket.put(TEST_KEY, TEST_PERSON).blockingAwait();
+        Assertions.assertThat(subscriber.valueCount()).isEqualTo(1);
+
         pocket.delete(TEST_KEY).blockingAwait();
 
         Assertions.assertThat(subscriber.valueCount()).isEqualTo(2);

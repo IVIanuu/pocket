@@ -12,6 +12,8 @@ import com.ivianuu.pocket.Storage;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Shared preferences storage implementation
  */
@@ -30,6 +32,7 @@ public final class SharedPreferencesStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context) {
+        checkNotNull(context, "context == null");
         return create(PreferenceManager.getDefaultSharedPreferences(context));
     }
 
@@ -39,6 +42,8 @@ public final class SharedPreferencesStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context, @NonNull String name) {
+        checkNotNull(context, "context == null");
+        checkNotNull(name, "name == null");
         return create(context.getSharedPreferences(name, Context.MODE_PRIVATE));
     }
 
@@ -47,6 +52,7 @@ public final class SharedPreferencesStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull SharedPreferences sharedPreferences) {
+        checkNotNull(sharedPreferences, "sharedPreferences == null");
         return new SharedPreferencesStorage(sharedPreferences);
     }
 

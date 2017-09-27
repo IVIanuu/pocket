@@ -19,6 +19,8 @@ package com.ivianuu.pocket.impl;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Option
  */
@@ -35,6 +37,7 @@ public final class Option<T> {
      */
     @NonNull
     public static <T> Option<T> of(@NonNull T value) {
+        checkNotNull(value, "value == null");
         return new Option<>(value);
     }
 

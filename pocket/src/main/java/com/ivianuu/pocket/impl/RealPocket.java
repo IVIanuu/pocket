@@ -36,6 +36,8 @@ import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Pocket implementation
  */
@@ -53,6 +55,8 @@ public class RealPocket implements Pocket {
                       @NonNull Storage storage,
                       @NonNull Serializer serializer,
                       @Nullable Scheduler scheduler) {
+        checkNotNull(storage, "storage == null");
+        checkNotNull(serializer, "serializer == null");
         if (cache == null) {
             cache = NoOpCache.create();
         }
@@ -68,6 +72,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public Completable put(@NonNull final String key, @NonNull final Object value) {
+        checkNotNull(key, "key == null");
+        checkNotNull(value, "value == null");
         return internalPocket.put(key, value);
     }
 
@@ -75,6 +81,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Class<T> clazz) {
+        checkNotNull(key, "key == null");
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.get(key, clazz);
     }
 
@@ -82,6 +90,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Maybe<T> get(@NonNull final String key, @NonNull final Type type) {
+        checkNotNull(key, "key == null");
+        checkNotNull(type, "type == null");
         return internalPocket.get(key, type);
     }
 
@@ -89,6 +99,9 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Class<T> clazz) {
+        checkNotNull(key, "key == null");
+        checkNotNull(defaultValue, "defaultValue == null");
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.get(key, defaultValue, clazz);
     }
 
@@ -96,6 +109,9 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<T> get(@NonNull String key, @NonNull T defaultValue, @NonNull Type type) {
+        checkNotNull(key, "key == null");
+        checkNotNull(defaultValue, "defaultValue == null");
+        checkNotNull(type, "type == null");
         return internalPocket.get(key, defaultValue, type);
     }
 
@@ -103,6 +119,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Class<T> clazz) {
+        checkNotNull(key, "key == null");
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.getOptional(key, clazz);
     }
 
@@ -110,6 +128,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Single<Option<T>> getOptional(@NonNull String key, @NonNull Type type) {
+        checkNotNull(key, "key == null");
+        checkNotNull(type, "type == null");
         return internalPocket.getOptional(key, type);
     }
 
@@ -117,6 +137,7 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public Completable delete(@NonNull final String key) {
+        checkNotNull(key, "key == null");
         return internalPocket.delete(key);
     }
 
@@ -131,6 +152,7 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public Single<Boolean> contains(@NonNull final String key) {
+        checkNotNull(key, "key == null");
         return internalPocket.contains(key);
     }
 
@@ -144,13 +166,15 @@ public class RealPocket implements Pocket {
     @CheckResult
     @NonNull
     @Override
-    public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
+    public <T> Single<Map<String, T>> getAll(@NonNull Class<T> clazz) {
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.getAll(clazz);
     }
 
     @CheckResult @NonNull
     @Override
-    public <T> Single<Map<String, T>> getAll(final Type type) {
+    public <T> Single<Map<String, T>> getAll(@NonNull final Type type) {
+        checkNotNull(type, "type == null");
         return internalPocket.getAll(type);
     }
 
@@ -172,6 +196,7 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Map.Entry<String, T>> stream(@NonNull Class<T> clazz) {
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.stream(clazz);
     }
 
@@ -179,6 +204,7 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Map.Entry<String, T>> stream(@NonNull final Type type) {
+        checkNotNull(type, "type == null");
         return internalPocket.stream(type);
     }
 
@@ -186,6 +212,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Class<T> clazz) {
+        checkNotNull(key, "key == null");
+        checkNotNull(clazz, "clazz == null");
         return internalPocket.stream(key, clazz);
     }
 
@@ -193,6 +221,8 @@ public class RealPocket implements Pocket {
     @NonNull
     @Override
     public <T> Flowable<Option<T>> stream(@NonNull final String key, @NonNull final Type type) {
+        checkNotNull(key, "key == null");
+        checkNotNull(type, "type == null");
         return internalPocket.stream(key, type);
     }
 
@@ -201,6 +231,7 @@ public class RealPocket implements Pocket {
      */
     @CheckResult @NonNull
     protected <T> Maybe<T> cached(@NonNull String key) {
+        checkNotNull(key, "key == null");
         return internalPocket.cached(key);
     }
 }

@@ -246,13 +246,13 @@ final class RealInternalPocket implements InternalPocket {
     @CheckResult
     @NonNull
     @Override
-    public <T> Single<Map<String, T>> getAll(Class<T> clazz) {
+    public <T> Single<Map<String, T>> getAll(@NonNull Class<T> clazz) {
         return getAll((Type) clazz);
     }
 
     @CheckResult @NonNull
     @Override
-    public <T> Single<Map<String, T>> getAll(final Type type) {
+    public <T> Single<Map<String, T>> getAll(@NonNull final Type type) {
         Single<Map<String, T>> single = getAllKeys()
                 .map(keys -> {
                     Map<String, T> map = new LinkedHashMap<>();

@@ -109,13 +109,13 @@ public interface Pocket {
      * Returns a map of all all keys with the provided value type
      */
     @CheckResult @NonNull
-    <T> Single<Map<String, T>> getAll(Class<T> clazz);
+    <T> Single<Map<String, T>> getAll(@NonNull Class<T> clazz);
 
     /**
      * Returns a map of all all keys with the provided value type
      */
     @CheckResult @NonNull
-    <T> Single<Map<String, T>> getAll(Type type);
+    <T> Single<Map<String, T>> getAll(@NonNull Type type);
 
     /**
      * Returns the count of all entries

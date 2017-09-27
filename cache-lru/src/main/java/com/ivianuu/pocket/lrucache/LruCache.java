@@ -21,6 +21,8 @@ import android.support.annotation.Nullable;
 
 import com.ivianuu.pocket.Cache;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Simple lru cache implementation
  */
@@ -45,6 +47,7 @@ public final class LruCache implements Cache {
      */
     @NonNull
     public static Cache create(@NonNull android.support.v4.util.LruCache<String, Object> lruCache) {
+        checkNotNull(lruCache, "lruCache == null");
         return new LruCache(lruCache);
     }
 

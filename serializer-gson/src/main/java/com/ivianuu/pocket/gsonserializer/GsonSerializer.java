@@ -23,6 +23,8 @@ import com.ivianuu.pocket.Serializer;
 
 import java.lang.reflect.Type;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Gson serializer implementation
  */
@@ -48,6 +50,7 @@ public final class GsonSerializer implements Serializer {
      */
     @NonNull
     public static Serializer create(@NonNull Gson gson) {
+        checkNotNull(gson, "gson == null");
         return new GsonSerializer(gson);
     }
 

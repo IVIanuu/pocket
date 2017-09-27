@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Storage implementation
  */
@@ -57,6 +59,7 @@ public final class FileSystemStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context) {
+        checkNotNull(context, "context == null");
         File filesDir = new File(
                 context.getApplicationContext().getFilesDir().getPath() + File.separator + DEFAULT_FILES_DIR);
         return create(filesDir);
@@ -67,6 +70,8 @@ public final class FileSystemStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull Context context, @NonNull String name) {
+        checkNotNull(context, "context == null");
+        checkNotNull(name, "name == null");
         File filesDir = new File(
                 context.getApplicationContext().getFilesDir().getPath() + File.separator + name);
         return create(filesDir);
@@ -77,6 +82,7 @@ public final class FileSystemStorage implements Storage {
      */
     @NonNull
     public static Storage create(@NonNull File filesDir) {
+        checkNotNull(filesDir, "filesDir == null");
         return new FileSystemStorage(filesDir);
     }
 

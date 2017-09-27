@@ -24,6 +24,8 @@ import com.squareup.moshi.Moshi;
 
 import java.lang.reflect.Type;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Moshi serializer implementation
  */
@@ -48,6 +50,7 @@ public final class MoshiSerializer implements Serializer {
      */
     @NonNull
     public static Serializer create(@NonNull Moshi moshi) {
+        checkNotNull(moshi, "moshi == null");
         return new MoshiSerializer(moshi);
     }
 

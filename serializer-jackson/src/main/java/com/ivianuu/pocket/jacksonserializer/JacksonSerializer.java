@@ -26,6 +26,8 @@ import com.ivianuu.pocket.Serializer;
 
 import java.lang.reflect.Type;
 
+import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+
 /**
  * Jackson serializer implementation
  */
@@ -50,6 +52,7 @@ public final class JacksonSerializer implements Serializer {
      */
     @NonNull
     public static Serializer create(@NonNull ObjectMapper objectMapper) {
+        checkNotNull(objectMapper, "objectMapper == null");
         return new JacksonSerializer(objectMapper);
     }
 

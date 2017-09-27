@@ -89,14 +89,6 @@ public final class RealPocketBuilder {
      */
     @NonNull
     public Pocket build() {
-        // check required modules
-        if (storage == null) {
-            throw new IllegalStateException("storage must be set");
-        }
-        if (serializer == null) {
-            throw new IllegalStateException("serializer must be set");
-        }
-
         return new RealPocket(cache, encryption, storage, serializer, scheduler);
     }
 }

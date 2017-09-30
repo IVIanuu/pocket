@@ -32,6 +32,7 @@ dependencies {
     testImplementation project(':serializer-gson')
     testImplementation rootProject.ext.junit
     testImplementation(rootProject.ext.assertj) {
+
         exclude module: 'support-annotations'
     }
 }

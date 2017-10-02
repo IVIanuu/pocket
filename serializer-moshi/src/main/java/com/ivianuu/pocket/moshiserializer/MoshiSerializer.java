@@ -24,7 +24,7 @@ import com.squareup.moshi.Moshi;
 
 import java.lang.reflect.Type;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Moshi serializer implementation

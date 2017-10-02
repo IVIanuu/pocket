@@ -19,7 +19,7 @@ package com.ivianuu.pocket.impl;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Option

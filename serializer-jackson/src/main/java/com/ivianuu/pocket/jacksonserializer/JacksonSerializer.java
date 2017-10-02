@@ -26,7 +26,7 @@ import com.ivianuu.pocket.Serializer;
 
 import java.lang.reflect.Type;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Jackson serializer implementation

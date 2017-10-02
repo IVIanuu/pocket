@@ -12,7 +12,7 @@ import com.ivianuu.pocket.Storage;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Shared preferences storage implementation

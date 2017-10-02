@@ -36,7 +36,7 @@ import io.reactivex.Maybe;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Pocket implementation

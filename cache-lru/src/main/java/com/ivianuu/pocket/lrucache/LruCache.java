@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 
 import com.ivianuu.pocket.Cache;
 
-import static com.ivianuu.preconditions.Preconditions.checkNotNull;
+import static com.ivianuu.pocket.Preconditions.checkNotNull;
 
 /**
  * Simple lru cache implementation

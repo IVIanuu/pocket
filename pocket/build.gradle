@@ -25,9 +25,6 @@ dependencies {
     // RxJava
     api rootProject.ext.rxJava
 
-    // Preconditions
-    api rootProject.ext.preconditions
-
     // Test
     testImplementation project(':serializer-gson')
     testImplementation rootProject.ext.junit

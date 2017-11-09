@@ -115,14 +115,10 @@ final class RealInternalPocket implements InternalPocket {
                         T value = serializer.deserialize(serialized, type);
 
                         // notify
-                        if (!e.isDisposed()) {
-                            e.onSuccess(value);
-                        }
+                        e.onSuccess(value);
                     }
 
-                    if (!e.isDisposed()) {
-                        e.onComplete();
-                    }
+                    e.onComplete();
                 }).doOnSuccess(value -> {
                     // put into the cache
                     cache.put(key, value);

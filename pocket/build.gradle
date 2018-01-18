@@ -1,11 +1,11 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.ivianuu'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -19,19 +19,11 @@ android {
 }
 
 dependencies {
-    // Android support
-    api rootProject.ext.supportAnnotations
+    // Kotlin
+    api rootProject.ext.kotlinStdlib
 
     // RxJava
     api rootProject.ext.rxJava
-
-    // Test
-    testImplementation project(':serializer-gson')
-    testImplementation rootProject.ext.junit
-    testImplementation(rootProject.ext.assertj) {
-
-        exclude module: 'support-annotations'
-    }
 }
 
 // build a jar with source files

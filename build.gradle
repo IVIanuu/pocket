@@ -17,39 +17,26 @@
 buildscript {
 
     ext {
-        androidPlugin = 'com.android.tools.build:gradle:3.0.0-rc2'
+        androidPlugin = 'com.android.tools.build:gradle:3.0.1'
         minSdkVersion = 14
-        compileSdkVersion = 26
-        targetSdkVersion = 26
-        buildToolsVersion = '26.0.2'
+        compileSdkVersion = 27
+        targetSdkVersion = 27
 
-        kotlinVersion = '1.1.51'
+        kotlinVersion = '1.2.20'
         kotlinPlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
 
         mavenPlugin = 'com.github.dcendents:android-maven-gradle-plugin:1.5'
 
-        gson = 'com.google.code.gson:gson:2.8.1'
-
-        jacksonVersion = '2.9.0'
-        jacksonCore = "com.fasterxml.jackson.core:jackson-core:$jacksonVersion"
-        jacksonAnnotations = "com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion"
-        jacksonDatabind = "com.fasterxml.jackson.core:jackson-databind:$jacksonVersion"
-
         moshi = 'com.squareup.moshi:moshi:1.5.0'
 
-        supportVersion = '26.1.0'
-        supportAnnotations = "com.android.support:support-annotations:$supportVersion"
+        supportVersion = '27.0.1'
         supportAppCompat = "com.android.support:appcompat-v7:$supportVersion"
-        supportCoreUtils = "com.android.support:support-core-utils:$supportVersion"
         supportRecyclerView = "com.android.support:recyclerview-v7:$supportVersion"
 
-        rxJava = 'io.reactivex.rxjava2:rxjava:2.1.3'
+        rxJava = 'io.reactivex.rxjava2:rxjava:2.1.7'
 
         rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.1'
-
-        junit = 'junit:junit:4.12'
-        assertj = 'com.squareup.assertj:assertj-android:1.1.0'
     }
 
     repositories {

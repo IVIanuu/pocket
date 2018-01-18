@@ -8,16 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/cache-lru" />
-            <option value="$PROJECT_DIR$/encryption-base64" />
+            <option value="$PROJECT_DIR$/parser-moshi" />
             <option value="$PROJECT_DIR$/pocket" />
-            <option value="$PROJECT_DIR$/pocket-kotlin" />
             <option value="$PROJECT_DIR$/sample" />
-            <option value="$PROJECT_DIR$/serializer-gson" />
-            <option value="$PROJECT_DIR$/serializer-jackson" />
-            <option value="$PROJECT_DIR$/serializer-moshi" />
             <option value="$PROJECT_DIR$/storage-filesystem" />
-            <option value="$PROJECT_DIR$/storage-sharedpreferences" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

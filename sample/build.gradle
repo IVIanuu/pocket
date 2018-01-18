@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         applicationId "com.ivianuu.pocket.sample"
@@ -19,31 +19,22 @@ android {
 }
 
 dependencies {
+    // Android support
+    implementation rootProject.ext.supportAppCompat
+    implementation rootProject.ext.supportRecyclerView
+
+    // Kotlin
+    implementation rootProject.ext.kotlinStdlib
+
     // RxAndroid
     implementation rootProject.ext.rxAndroid
 
     // Pocket
     implementation project(':pocket')
 
-    // Cache
-    implementation project(':cache-lru')
-
-    // Encryption
-    implementation project(':encryption-base64')
-
-    // Gson Serializer
-    implementation project(':serializer-gson')
-
     // Filesystem storage
     implementation project(':storage-filesystem')
 
-    // Moshi Serializer
-    implementation project(':serializer-moshi')
-
-    // Shared Preferences storage
-    implementation project(':storage-sharedpreferences')
-
-    // Android support
-    implementation rootProject.ext.supportAppCompat
-    implementation rootProject.ext.supportRecyclerView
+    // Moshi Parser
+    implementation project(':parser-moshi')
 }

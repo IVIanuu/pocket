@@ -5,6 +5,7 @@
       <w>jacksonserializer</w>
       <w>moshi</w>
       <w>moshiserializer</w>
+      <w>noop</w>
       <w>sharedpreferencesstorage</w>
     </words>
   </dictionary>

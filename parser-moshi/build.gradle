@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
-group='com.github.ivianuu'
+group = 'com.github.ivianuu'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -20,7 +20,10 @@ android {
 
 dependencies {
     // Kotlin
-    implementation rootProject.ext.kotlinStdlib
+    api rootProject.ext.kotlinStdlib
+
+    // Moshi
+    api rootProject.ext.moshi
 
     // Pocket
     implementation project(':pocket')
@@ -33,7 +36,7 @@ task sourcesJar(type: Jar) {
 }
 
 task javadoc(type: Javadoc) {
-    failOnError  false
+    failOnError false
     source = android.sourceSets.main.java.sourceFiles
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     classpath += configurations.compile

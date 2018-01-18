@@ -3,16 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Pocket.iml" filepath="$PROJECT_DIR$/Pocket.iml" />
-      <module fileurl="file://$PROJECT_DIR$/cache-lru/cache-lru.iml" filepath="$PROJECT_DIR$/cache-lru/cache-lru.iml" />
-      <module fileurl="file://$PROJECT_DIR$/encryption-base64/encryption-base64.iml" filepath="$PROJECT_DIR$/encryption-base64/encryption-base64.iml" />
+      <module fileurl="file://$PROJECT_DIR$/parser-moshi/serializer-moshi.iml" filepath="$PROJECT_DIR$/parser-moshi/serializer-moshi.iml" />
       <module fileurl="file://$PROJECT_DIR$/pocket/pocket.iml" filepath="$PROJECT_DIR$/pocket/pocket.iml" />
-      <module fileurl="file://$PROJECT_DIR$/pocket-kotlin/pocket-kotlin.iml" filepath="$PROJECT_DIR$/pocket-kotlin/pocket-kotlin.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
-      <module fileurl="file://$PROJECT_DIR$/serializer-gson/serializer-gson.iml" filepath="$PROJECT_DIR$/serializer-gson/serializer-gson.iml" />
-      <module fileurl="file://$PROJECT_DIR$/serializer-jackson/serializer-jackson.iml" filepath="$PROJECT_DIR$/serializer-jackson/serializer-jackson.iml" />
-      <module fileurl="file://$PROJECT_DIR$/serializer-moshi/serializer-moshi.iml" filepath="$PROJECT_DIR$/serializer-moshi/serializer-moshi.iml" />
       <module fileurl="file://$PROJECT_DIR$/storage-filesystem/storage-filesystem.iml" filepath="$PROJECT_DIR$/storage-filesystem/storage-filesystem.iml" />
-      <module fileurl="file://$PROJECT_DIR$/storage-sharedpreferences/storage-sharedpreferences.iml" filepath="$PROJECT_DIR$/storage-sharedpreferences/storage-sharedpreferences.iml" />
     </modules>
   </component>
 </project>

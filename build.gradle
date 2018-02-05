@@ -22,19 +22,19 @@ buildscript {
         compileSdkVersion = 27
         targetSdkVersion = 27
 
-        kotlinVersion = '1.2.20'
+        kotlinVersion = '1.2.21'
         kotlinPlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlinVersion"
 
-        mavenPlugin = 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        mavenPlugin = 'com.github.dcendents:android-maven-gradle-plugin:2.0'
 
         moshi = 'com.squareup.moshi:moshi:1.5.0'
 
-        supportVersion = '27.0.1'
+        supportVersion = '27.0.2'
         supportAppCompat = "com.android.support:appcompat-v7:$supportVersion"
         supportRecyclerView = "com.android.support:recyclerview-v7:$supportVersion"
 
-        rxJava = 'io.reactivex.rxjava2:rxjava:2.1.7'
+        rxJava = 'io.reactivex.rxjava2:rxjava:2.1.8'
 
         rxAndroid = 'io.reactivex.rxjava2:rxandroid:2.0.1'
     }
